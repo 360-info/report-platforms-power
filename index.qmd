@@ -233,7 +233,7 @@ get_words_and_links <- function(snapshot_url, css) {
     { tibble(url = html_attr(., "href"), label = html_text(.)) } %>%
     # <a> that contain "policy", "policies", "terms"... but not "printable")
     filter(str_detect(label,
-      regex("terms|policy|policies", ignore_case = TRUE))) %>%
+      regex("terms|policy|policies|notice", ignore_case = TRUE))) %>%
     filter(str_detect(label, "printable", negate = TRUE)) %>%
     filter(str_detect(label, "plain text", negate = TRUE)) %>%
     distinct(url, .keep_all = TRUE) %>%
