@@ -160,3 +160,132 @@ fb_terms_primary %>%
       title = toupper("Facebook terms of use"))
 }
 ```
+
+I'm interested in why the terms spiked so high in the late 2000s before dropping back down in 2010. My suspicion is that Facebook has broken its terms up into "supplementary" terms of use for parts of its products, like its [Facebook Pages, Groups and Events Policy](Facebook Pages, Groups and Events Policy). Most people would consider groups and events fairly core features of Facebook, but these terms are broken into a separate document.
+
+### Getting supplementary terms
+
+One approach to handling these terms is to modify our scraper to pull out links and scrape them for the same date too. We need to be careful to screen out duplicate links too, though, and if those terms in turn link to others, we'd need to screen out ones we'd already scraped to avoid circular definitions.
+
+```{r}
+#| label: scrapelinksfn
+#| code-fold: true
+#| code-summary: "Show the scraping and extraction function"
+
+#' @param url The url of the page to look up (eg.
+#'   https://www.facebook.com/terms.php)
+#' @param dt A Date object, or a string in YYMMDD format, to try and get the
+#'   snapshot from. If ommitted, the latest is used.
+#' @return A list containing:
+#'   - dt: the actual date-time of the snapshot
+#'   - snapshot_url: the url of the snapshot
+request_snapshot <- function(url, dt) {
+
+  # construct the url to lookup the snapshot (add timestamp if requested)
+  lookup_url <- paste0("http://archive.org/wayback/available?url=", url)
+  if (!is_empty(dt)) {
+    if (class(dt) == "Date") {
+      lookup_url <- paste0(lookup_url, "&timestamp=", format(dt, "%Y%M%d"))
+    } else {
+      lookup_url <- paste0(lookup_url, "&timestamp=", dt)
+    }
+  }
+
+  response <- GET(lookup_url)
+
+  # check for missing content
+  if (response$status != 200L) {
+    warning(paste("HTTP", response$status, "thrown"))
+  }
+  is_available <- content(response)$archived_snapshots$closest$available
+  if (is_empty(is_available) || (!is_available)) {
+    stop("No snapshot available")
+  }
+
+  # extract the actual snapshot time and url
+  snapshot_url <- content(response)$archived_snapshots$closest$url
+  snapshot_dt <-
+    content(response)$archived_snapshots$closest$timestamp %>%
+    ymd_hms()
+
+  return(list(
+    snapshot_dt = snapshot_dt,
+    snapshot_url = snapshot_url))
+}
+
+#' @param url The url of the page snapshot to look up (eg.
+#'   https://web.archive.org/web/20220223013629/
+#'     https://www.facebook.com/terms.php)
+#' @param css The css selector to use to extract text
+#' @return A list containing:
+#'   - dt: the actual date-time of the snapshot
+#'   - url: the url of the snapshot
+#'   - words: a tidy data frame of word tokens as from tidytext::unnest_tokens
+get_words_and_links <- function(snapshot_url, css) {
+
+  # extract the snapshot content
+  scrape <- read_html(snapshot_url)
+
+  # identify links
+  scrape %>%
+    html_element(css) %>%
+    html_elements("a") %>%
+    { tibble(url = html_attr(., "href"), label = html_text(.)) } %>%
+    # <a> that contain "policy", "policies", "terms"... but not "printable")
+    filter(str_detect(label,
+      regex("terms|policy|policies", ignore_case = TRUE))) %>%
+    filter(str_detect(label, "printable", negate = TRUE)) %>%
+    filter(str_detect(label, "plain text", negate = TRUE)) %>%
+    distinct(url, .keep_all = TRUE) %>%
+    mutate(label = str_trim(label)) ->
+  scrape_links
+
+  # extract the text from the page and break it by paragraph
+  scrape %>%
+    html_element(css) %>%
+    html_text2() %>%
+    str_split(regex("\n+")) %>%
+    pluck(1) ->
+  scrape_text
+
+  scrape_text %>%
+    tibble(line = 1:length(.), text = .) %>%
+    unnest_tokens(word, text) ->
+  scrape_words
+
+  # return the words and the 
+  return(list(
+    words = scrape_words,
+    links = scrape_links
+  ))
+}
+```
+
+Now we can re-run this scraper, then run it on the extracted links! Because Wayback Machine substitues links in a snapshot with the snapshotted versions of those documents (and then redirects to a nearby snapshot of that document), I've split the process up into two steps:
+
+1. `request_snapshot`: getting a snapshot URL from Wayback Machine, and
+2. `get_words_and_links`: then actually scraping the screenshot.
+
+We can skip the first step for the secondary policies!
+
+```{r}
+seq(as.Date("2005-12-15"), Sys.Date(), by = "month") %>%
+  tibble(
+    url = "https://www.facebook.com/terms.php",
+    css = "#content",
+    dt = .) %>%
+  # test: first and last two rows
+  slice(c(1:2, (n() - 1):n())) %>%
+  mutate(
+    # do the intiial lookup
+    lookup = map2_peacefully(url, dt, request_snapshot),
+    prim_snapshot_dt = map_chr(lookup, c("result", "snapshot_dt")),
+    prim_snapshot_url = map_chr(lookup, c("result", "snapshot_url")),
+    # then scrape the snapshot
+    prim_scrape = map2_peacefully(prim_snapshot_url, css, get_words_and_links),
+    prim_words = map_chr(lookup, c("result", "words")),
+    prim_links = map_chr(lookup, c("result", "links"))) ->
+fb_terms_firststage
+```
+
+Now we need to do the secondary scan based on the links!
