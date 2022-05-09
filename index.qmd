@@ -1,0 +1,81 @@
+---
+title: "Platforms and Power"
+subtitle: "Visualising the changing length of user agreements"
+author: "James Goldie, 360info"
+date: "2022-05-09"
+code-fold: true
+theme: style/article.scss
+---
+
+This demo analyses the changing length of the user agreements that major tech companies use. We'll use the [Wayback Machine API](https://archive.org/help/wayback_api.php) to identify snapshots of platform APIs, extract the text at different points in time, and analyse their word length.
+
+
+```{r}
+library(tidyverse)
+library(httr)
+library(rvest)
+library(stringr)
+library(tidytext)
+library(here)
+```
+
+## Test case: Facebook
+
+Facebook's Terms of Service are currently at <https://www.facebook.com/terms.php>. Let's see the most recent Wayback Machine snapshot:
+
+```{r}
+#| label: demolookup
+paste0(
+  "http://archive.org/wayback/available?url=",
+  "https://www.facebook.com/terms.php") %>%
+  GET() ->
+fb_snapshot
+
+content(fb_snapshot)
+```
+
+We can access the newest snapshot at <`r content(fb_snapshot)$archived_snapshots$closest$url`> using the `{rvest}` package. The text of the agreement (as well as buttons to jump to the various sections) is available in the `#content` node:
+
+```{r}
+#| label: demoscrape
+
+demo_scrape <- read_html(content(fb_snapshot)$archived_snapshots$closest$url)
+
+# get the terms of use text, breaking up by line(s)
+demo_text <- demo_scrape %>%
+  html_element("#content") %>%
+  html_text2() %>%
+  str_split(regex("\n+")) %>%
+  pluck(1)
+
+# tidy text mining format
+tibble(line = 1:length(demo_text), text = demo_text) %>%
+  unnest_tokens(word, text) ->
+demo_words
+```
+
+The terms (including the Meta transition preface and the buttons) contain `r nrow(demo_words)` words.
+
+### Comparing to past snapshots
+
+But we want to see what this was like in the past.
+
+```{r}
+
+# get hashes of snapshots (url, year, compress?):
+# https://gext-api.archive.org/services/simhash/simhash?year=2012&url=https://www.facebook.com/terms.php&compress=1
+# response:
+# {
+#   captures: [2012,
+#     [1, 
+#       [15,
+#         ["HHMMSS", score?], ...
+#       ]   # 15th
+#     ]   # jan
+#   ]
+#   hashes: [XXXX, XXXX],
+#   status: "COMPLETE"
+#   total_captures: 585
+# }
+
+```
