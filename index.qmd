@@ -277,10 +277,24 @@ Now we can re-run this scraper, then run it on the extracted links! Because Wayb
 We can skip the first step for the secondary policies!
 
 ```{r}
-seq(as.Date("2005-12-15"), Sys.Date(), by = "month") %>%
+#| label: fbprimaryscrape
+
+# get the 3 primary sets of terms for each month since 2005
+fb_primary_terms <- tibble(
+  url = c(
+    "https://www.facebook.com/legal/terms",
+    "https://www.facebook.com/about/privacy/update",
+    "https://www.facebook.com/policies/cookies"),
+  css = c("#content", "._5tkp", "._5tkp"))
+date_seq <- seq(as.Date("2005-12-15"), Sys.Date(), by = "month")
+
+expand_grid(fb_primary_terms, date_seq) %>%
   tibble(
-    url = "https://www.facebook.com/terms.php",
-    css = "#content",
+    url = c(
+      "https://www.facebook.com/legal/terms",
+      "https://www.facebook.com/about/privacy/update",
+      "https://www.facebook.com/policies/cookies"),
+    css = c("#content", "._5tkp", "._5tkp"),
     dt = .) %>%
   # test: first and last two rows
   slice(c(1:2, (n() - 1):n())) %>%
@@ -291,9 +305,25 @@ seq(as.Date("2005-12-15"), Sys.Date(), by = "month") %>%
     prim_snapshot_url = map_chr(lookup, c("result", "snapshot_url")),
     # then scrape the snapshot
     prim_scrape = map2_peacefully(prim_snapshot_url, css, get_words_and_links),
-    prim_words = map_chr(lookup, c("result", "words")),
-    prim_links = map_chr(lookup, c("result", "links"))) ->
+    prim_words = map(prim_scrape, c("result", "words")),
+    prim_links = map(prim_scrape, c("result", "links"))
+    ) ->
 fb_terms_firststage
 ```
 
 Now we need to do the secondary scan based on the links!
+
+```{r}
+fb_terms_firststage %>%
+  select(dt, prim_links) %>%
+  unnest_longer(prim_links) %>%
+  unpack(prim_links) %>%
+  # discard NAs and duplicate policies
+  distinct(dt, url, .keep_all = TRUE) %>% select(label, url) %>% print(n = Inf)
+  mutate(
+    css = "",
+    sec_scrape = map2_peacefully(url, css, get_words_and_links),
+    sec_words = map(sec_scrape, c("result", "words")),
+    sec_links = map(sec_scrape, c("result", "links"))
+    )
+```
