@@ -212,6 +212,12 @@ request_snapshot <- function(url, dt) {
     snapshot_dt = snapshot_dt,
     snapshot_url = snapshot_url))
 }
+```
+
+```{r}
+#| label: getwordslinksfn
+#| code-fold: true
+#| code-summary: "Show the words and links scraping function"
 
 #' @param url The url of the page snapshot to look up (eg.
 #'   https://web.archive.org/web/20220223013629/
