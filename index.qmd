@@ -168,9 +168,9 @@ I'm interested in why the terms spiked so high in the late 2000s before dropping
 One approach to handling these terms is to modify our scraper to pull out links and scrape them for the same date too. We need to be careful to screen out duplicate links too, though, and if those terms in turn link to others, we'd need to screen out ones we'd already scraped to avoid circular definitions.
 
 ```{r}
-#| label: scrapelinksfn
+#| label: reqsnapshotfn
 #| code-fold: true
-#| code-summary: "Show the scraping and extraction function"
+#| code-summary: "Show the snapshot request function"
 
 #' @param url The url of the page to look up (eg.
 #'   https://www.facebook.com/terms.php)
