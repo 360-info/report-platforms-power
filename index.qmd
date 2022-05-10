@@ -240,8 +240,10 @@ get_words_and_links <- function(snapshot_url, css) {
     # <a> that contain "policy", "policies", "terms"... but not "printable")
     filter(str_detect(label,
       regex("terms|policy|policies|notice", ignore_case = TRUE))) %>%
-    filter(str_detect(label, "printable", negate = TRUE)) %>%
-    filter(str_detect(label, "plain text", negate = TRUE)) %>%
+    filter(str_detect(label, coll("printable", ignore_case = TRUE),
+      negate = TRUE)) %>%
+    filter(str_detect(label, coll("plain text", ignore_case = TRUE),
+      negate = TRUE)) %>%
     distinct(url, .keep_all = TRUE) %>%
     mutate(label = str_trim(label)) ->
   scrape_links
