@@ -82,6 +82,7 @@ get_words <- function(url, css, dt = NULL) {
     content(response)$archived_snapshots$closest$timestamp %>%
     ymd_hms()
 
+
   # extract the snapshot content
   scrape <- read_html(snapshot_url)
 
@@ -118,7 +119,7 @@ The terms (including the Meta transition preface and the buttons) contain `r nro
 
 But we want to see what this was like in the past. The Wayback Machine has thousands of scrapes of this URL over the last 15 years, and I don't think we can look at all. But we could probably look at, say, one each month. The real question is whether the page structure changes significantly enough over time to throw our function off.
 
-[This scrape from 2018](https://web.archive.org/web/20180404004922/https://www.facebook.com/terms.php) still has the content in `#content`, which is good. So does [this scrape from 2015](https://web.archive.org/web/20150312205022/https://www.facebook.com/terms.php). [This one in 2012](https://web.archive.org/web/20120214045718/https://www.facebook.com/terms.php) redirects to `/legal/terms` (but scans fine). Same ad [this one in 2008](https://web.archive.org/web/20080220201805/https://www.facebook.com/terms.php).
+[This scrape from 2018](https://web.archive.org/web/20180404004922/https://www.facebook.com/terms.php) still has the content in `#content`, which is good. So does [this scrape from 2015](https://web.archive.org/web/20150312205022/https://www.facebook.com/terms.php). [This one in 2012](https://web.archive.org/web/20120214045718/https://www.facebook.com/terms.php) redirects to `/legal/terms` (but scans fine). Same for [this one in 2008](https://web.archive.org/web/20080220201805/https://www.facebook.com/terms.php).
 
 Sampling a few scrapes quickly, it looks like the page structure has been consistent all the way back to the first Wayback snapshots back in [late 2005](https://web.archive.org/web/20051228025855/https://www.facebook.com/terms.php). So we're looking pretty good here!
 
@@ -167,6 +168,8 @@ I'm interested in why the terms spiked so high in the late 2000s before dropping
 
 One approach to handling these terms is to modify our scraper to pull out links and scrape them for the same date too. We need to be careful to screen out duplicate links too, though, and if those terms in turn link to others, we'd need to screen out ones we'd already scraped to avoid circular definitions.
 
+Let's start with the snapshot request function:
+
 ```{r}
 #| label: reqsnapshotfn
 #| code-fold: true
@@ -214,6 +217,8 @@ request_snapshot <- function(url, dt) {
 }
 ```
 
+And now the scraping function. One challenge here is that Facebook's policy pages have adopted many designs over the years (and even at the same time for different policies), and so the CSS selector required varies. I've adopted a fallback approach, where the function takes a _vector_ of potential CSS selectors. It tries them in succession until it finds one in the document and then uses that to extract the text:
+
 ```{r}
 #| label: getwordslinksfn
 #| code-fold: true
@@ -222,7 +227,8 @@ request_snapshot <- function(url, dt) {
 #' @param url The url of the page snapshot to look up (eg.
 #'   https://web.archive.org/web/20220223013629/
 #'     https://www.facebook.com/terms.php)
-#' @param css The css selector to use to extract text
+#' @param css A vector of CSS selectors from which to attempt to extract article
+#'   text. These are tried successively until one is found in the page.
 #' @return A list containing:
 #'   - dt: the actual date-time of the snapshot
 #'   - url: the url of the snapshot
@@ -232,9 +238,21 @@ get_words_and_links <- function(snapshot_url, css) {
   # extract the snapshot content
   scrape <- read_html(snapshot_url)
 
+  # first, let's try to detect the selector that has the page content in it. this
+  # varies by page and over time!
+  # css_tries <- c("section._9lea", "#rebrandBodyID", "#content")
+  for (css_try in css) {
+    scrape_content <- scrape %>% html_element(css_try)
+    if (length(scrape_content) > 0L) {
+      break;
+    }
+  }
+  if (length(scrape_content) == 0L) {
+    stop("Couldn't auto-detect article content using supplied CSS")
+  }
+
   # identify links
-  scrape %>%
-    html_element(css) %>%
+  scrape_content %>%
     html_elements("a") %>%
     { tibble(url = html_attr(., "href"), label = html_text(.)) } %>%
     # <a> that contain "policy", "policies", "terms"... but not "printable")
@@ -249,8 +267,7 @@ get_words_and_links <- function(snapshot_url, css) {
   scrape_links
 
   # extract the text from the page and break it by paragraph
-  scrape %>%
-    html_element(css) %>%
+  scrape_content %>%
     html_text2() %>%
     str_split(regex("\n+")) %>%
     pluck(1) ->
@@ -269,49 +286,43 @@ get_words_and_links <- function(snapshot_url, css) {
 }
 ```
 
-Now we can re-run this scraper, then run it on the extracted links! Because Wayback Machine substitues links in a snapshot with the snapshotted versions of those documents (and then redirects to a nearby snapshot of that document), I've split the process up into two steps:
+Now we can re-run this scraper - first on the primary terms, then on the extracted links! Although Waybaack Machine does substitute links in snapshotted terms with snapshotted URLs, I've opted not to use them and to re-request a nearby snapshot from the original link URL, as related policies are not always snapshotted at the exact same time.
 
-1. `request_snapshot`: getting a snapshot URL from Wayback Machine, and
-2. `get_words_and_links`: then actually scraping the screenshot.
-
-We can skip the first step for the secondary policies!
+```{r}
+#| label: fbcss
+fb_css_tries <- c("section._9lea", "#rebrandBodyID", "#content",
+  ".documentation .content", "body table.bordertable[border=\"1\"]",
+  "div[role=\"main\"]")
+```
 
 ```{r}
 #| label: fbprimaryscrape
 
-# get the 3 primary sets of terms for each month since 2005
 fb_primary_terms <- tibble(
-  url = c(
-    "https://www.facebook.com/legal/terms",
-    "https://www.facebook.com/about/privacy/update",
-    "https://www.facebook.com/policies/cookies"),
-  css = c("#content", "._5tkp", "._5tkp"))
-date_seq <- seq(as.Date("2005-12-15"), Sys.Date(), by = "month")
+  url = "https://www.facebook.com/legal/terms",
+  type = "primary")
+dt <- seq(as.Date("2005-12-15"), Sys.Date(), by = "month")
 
-expand_grid(fb_primary_terms, date_seq) %>%
-  tibble(
-    url = c(
-      "https://www.facebook.com/legal/terms",
-      "https://www.facebook.com/about/privacy/update",
-      "https://www.facebook.com/policies/cookies"),
-    css = c("#content", "._5tkp", "._5tkp"),
-    dt = .) %>%
+expand_grid(fb_primary_terms, dt) %>%
   # test: first and last two rows
+  group_by(url) %>%
   slice(c(1:2, (n() - 1):n())) %>%
+  ungroup() %>%
   mutate(
     # do the intiial lookup
     lookup = map2_peacefully(url, dt, request_snapshot),
-    prim_snapshot_dt = map_chr(lookup, c("result", "snapshot_dt")),
+    prim_snapshot_dt = map(lookup, c("result", "snapshot_dt")),
     prim_snapshot_url = map_chr(lookup, c("result", "snapshot_url")),
     # then scrape the snapshot
-    prim_scrape = map2_peacefully(prim_snapshot_url, css, get_words_and_links),
+    prim_scrape = map_peacefully(prim_snapshot_url, get_words_and_links,
+      css = fb_css_tries),
     prim_words = map(prim_scrape, c("result", "words")),
-    prim_links = map(prim_scrape, c("result", "links"))
-    ) ->
+    prim_links = map(prim_scrape, c("result", "links"))) %>%
+  unnest(prim_snapshot_dt) ->
 fb_terms_firststage
 ```
 
-Now we need to do the secondary scan based on the links!
+Let's find out what the secondary policies are:
 
 ```{r}
 fb_terms_firststage %>%
@@ -319,11 +330,19 @@ fb_terms_firststage %>%
   unnest_longer(prim_links) %>%
   unpack(prim_links) %>%
   # discard NAs and duplicate policies
-  distinct(dt, url, .keep_all = TRUE) %>% select(label, url) %>% print(n = Inf)
+  distinct(dt, url, .keep_all = TRUE) %>%
   mutate(
-    css = "",
-    sec_scrape = map2_peacefully(url, css, get_words_and_links),
-    sec_words = map(sec_scrape, c("result", "words")),
-    sec_links = map(sec_scrape, c("result", "links"))
-    )
+    original_url = str_replace(
+      str_replace(url, fixed("http://web.archive.org"), ""),
+      regex("/web/[:digit:]{14}/"), ""),
+    # do the initial lookup
+    lookup = map2_peacefully(original_url, dt, request_snapshot),
+    sec_snapshot_dt = map(lookup, c("result", "snapshot_dt"), .null = NA),
+    sec_snapshot_url = map_chr(lookup, c("result", "snapshot_url"), .null = NA),
+    sec_scrape = map_peacefully(sec_snapshot_url, get_words_and_links,
+      css = fb_css_tries),
+    sec_words = map(sec_scrape, c("result", "words"))) %>%
+  unnest(sec_snapshot_dt) %>%
+  mutate(type = "secondary") ->
+fb_terms_secondary
 ```
