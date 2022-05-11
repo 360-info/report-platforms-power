@@ -22,151 +22,15 @@ library(themes360info)
 library(here)
 ```
 
-## Test case: Facebook
+## Introduction
 
-Facebook's Terms of Service are currently at <https://www.facebook.com/terms.php>. Let's see the most recent Wayback Machine snapshot:
+The Wayback Machine has thousands of scrapes of [Facebook's Terms of Service](https://www.facebook.com/terms.php) over the last 15 years, and I don't think we can look at all of them. But we could probably look at, say, one each month.
 
-```{r}
-#| label: demolookup
-paste0(
-  "http://archive.org/wayback/available?url=",
-  "https://www.facebook.com/terms.php") %>%
-  GET() ->
-fb_snapshot
+One thing I've noticed is that Facebook's Terms link out to a bunch of other policies and agreements, governing various feratures. Some of them, like Developer Payment Policies, may only affect a small subset of users - but others, like Groups, Pages and Events, would cover most regular Facebook users!
 
-content(fb_snapshot)
-```
+One approach to handling these ancillary agreements is to modify our scraper to pull out links from the primary agreement and to scrape those for the same date too.
 
-We can access the newest snapshot at <`r content(fb_snapshot)$archived_snapshots$closest$url`> using the `{rvest}` package. The text of the agreement (as well as buttons to jump to the various sections) is available in the `#content` node:
-
-```{r}
-#| label: scrapefn
-#| code-fold: true
-#| code-summary: "Show the scraping and extraction function"
-
-#' @param url The url of the page to look up (eg.
-#'   https://www.facebook.com/terms.php)
-#' @param css The css selector to use to extract text
-#' @param dt A Date object, or a string in YYMMDD format, to try and get the
-#'   snapshot from. If ommitted, the latest is used.
-#' @return A list containing:
-#'   - dt: the actual date-time of the snapshot
-#'   - url: the url of the snapshot
-#'   - words: a tidy data frame of word tokens as from tidytext::unnest_tokens()
-get_words <- function(url, css, dt = NULL) {
-
-  # construct the url to lookup the snapshot (add timestamp if requested)
-  lookup_url <- paste0("http://archive.org/wayback/available?url=", url)
-  if (!is_empty(dt)) {
-    if (class(dt) == "Date") {
-      lookup_url <- paste0(lookup_url, "&timestamp=", format(dt, "%Y%M%d"))
-    } else {
-      lookup_url <- paste0(lookup_url, "&timestamp=", dt)
-    }
-  }
-
-  response <- GET(lookup_url)
-
-  # check for missing content
-  if (response$status != 200L) {
-    warning(paste("HTTP", response$status, "thrown"))
-  }
-  is_available <- content(response)$archived_snapshots$closest$available
-  if (is_empty(is_available) || (!is_available)) {
-    stop("No snapshot available")
-  }
-
-  # extract the actual snapshot time and url
-  snapshot_url <- content(response)$archived_snapshots$closest$url
-  snapshot_dt <-
-    content(response)$archived_snapshots$closest$timestamp %>%
-    ymd_hms()
-
-
-  # extract the snapshot content
-  scrape <- read_html(snapshot_url)
-
-  # extract the text from the page and break it by paragraph
-  scrape %>%
-    html_element(css) %>%
-    html_text2() %>%
-    str_split(regex("\n+")) %>%
-    pluck(1) ->
-  scrape_text
-
-  scrape_text %>%
-    tibble(line = 1:length(.), text = .) %>%
-    unnest_tokens(word, text) ->
-  scrape_words
-
-  # return the words and the 
-  return(list(
-    dt = snapshot_dt,
-    lookup_url = lookup_url,
-    snapshot_url = snapshot_url,
-    words = scrape_words
-  ))
-}
-```
-
-```{r}
-demo_words <- get_words("https://www.facebook.com/terms.php", "#content")
-```
-
-The terms (including the Meta transition preface and the buttons) contain `r nrow(demo_words)` words.
-
-### Comparing to past snapshots
-
-But we want to see what this was like in the past. The Wayback Machine has thousands of scrapes of this URL over the last 15 years, and I don't think we can look at all. But we could probably look at, say, one each month. The real question is whether the page structure changes significantly enough over time to throw our function off.
-
-[This scrape from 2018](https://web.archive.org/web/20180404004922/https://www.facebook.com/terms.php) still has the content in `#content`, which is good. So does [this scrape from 2015](https://web.archive.org/web/20150312205022/https://www.facebook.com/terms.php). [This one in 2012](https://web.archive.org/web/20120214045718/https://www.facebook.com/terms.php) redirects to `/legal/terms` (but scans fine). Same for [this one in 2008](https://web.archive.org/web/20080220201805/https://www.facebook.com/terms.php).
-
-Sampling a few scrapes quickly, it looks like the page structure has been consistent all the way back to the first Wayback snapshots back in [late 2005](https://web.archive.org/web/20051228025855/https://www.facebook.com/terms.php). So we're looking pretty good here!
-
-:::{.callout-note}
-Most of these terms link out to "supplementary terms of use" that govern the use of optional features or related products. I'm not going to try to analyse these for now, but we might come back to them!
-:::
-
-```{r}
-seq(as.Date("2005-12-15"), Sys.Date(), by = "month") %>%
-  tibble(
-    url = "https://www.facebook.com/terms.php",
-    css = "#content",
-    dt = .) %>%
-  # test: first and last two rows
-  # slice(c(1:2, (n() - 1):n())) %>%
-  mutate(
-    words = pmap_peacefully(., get_words),
-    lookup_url = map_chr(words, c("result", "lookup_url")),
-    snapshot_url = map_chr(words, c("result", "snapshot_url")),
-    par_count = map_int(words, ~ max(.x$result$words$line)),
-    word_count = map_int(words, ~ nrow(.x$result$words))) ->
-fb_terms_primary
-```
-
-How does that look?
-
-```{r}
-fb_terms_primary %>%
-{
-  ggplot(.) +
-    aes(x = dt, y = word_count) +
-    geom_area(fill = alpha("#3b5998", 0.75), colour = "#3b5998") +
-    theme_360() +
-    theme(
-      panel.grid.major.x = element_blank(),
-      panel.grid.minor.x = element_blank()
-    ) +
-    labs(x = NULL, y = "Word count",
-      title = toupper("Facebook terms of use"))
-}
-```
-
-I'm interested in why the terms spiked so high in the late 2000s before dropping back down in 2010. My suspicion is that Facebook has broken its terms up into "supplementary" terms of use for parts of its products, like its [Facebook Pages, Groups and Events Policy](Facebook Pages, Groups and Events Policy). Most people would consider groups and events fairly core features of Facebook, but these terms are broken into a separate document.
-
-### Getting supplementary terms
-
-One approach to handling these terms is to modify our scraper to pull out links and scrape them for the same date too. We need to be careful to screen out duplicate links too, though, and if those terms in turn link to others, we'd need to screen out ones we'd already scraped to avoid circular definitions.
+We need to be careful to screen out duplicate links too, though, and if those terms in turn link to others, we'd need to screen out ones we'd already scraped to avoid circular definitions. For now, let's just recurse one level, rather than trying to map out an entire tree of agreements.
 
 Let's start with the snapshot request function:
 
@@ -274,7 +138,7 @@ get_words_and_links <- function(snapshot_url, css) {
   scrape_text
 
   scrape_text %>%
-    tibble(line = 1:length(.), text = .) %>%
+    tibble(para = 1:length(.), text = .) %>%
     unnest_tokens(word, text) ->
   scrape_words
 
@@ -286,7 +150,25 @@ get_words_and_links <- function(snapshot_url, css) {
 }
 ```
 
-Now we can re-run this scraper - first on the primary terms, then on the extracted links! Although Waybaack Machine does substitute links in snapshotted terms with snapshotted URLs, I've opted not to use them and to re-request a nearby snapshot from the original link URL, as related policies are not always snapshotted at the exact same time.
+Finally, a quick function to save our processed word counts:
+
+```{r}
+#| label: savetermsfn
+
+save_terms <- function(terms, date, policy, platform) {
+  dir.create(here("data", "terms", platform, date), recursive = TRUE)
+  
+  policy_safe <- str_to_lower(str_replace_all(policy, " ", "-"))
+  write_csv(terms, here("data", "terms", platform, date,
+    paste0(policy_safe, ".csv")))
+}
+```
+
+## Facebook
+
+Now that we have our essential machinery, we can run this scraper - first on Facebook's primary terms of use over time, then on the extracted links!
+
+Here're the CSS selectors that I think capture most of Facebook's redesigns:
 
 ```{r}
 #| label: fbcss
@@ -295,19 +177,21 @@ fb_css_tries <- c("section._9lea", "#rebrandBodyID", "#content",
   "div[role=\"main\"]")
 ```
 
+Although Waybaack Machine does substitute links in snapshotted terms with snapshotted URLs, I've opted not to use them and to re-request a nearby snapshot from the original link URL, as related policies are not always snapshotted at the exact same time.
+
 ```{r}
 #| label: fbprimaryscrape
 
 fb_primary_terms <- tibble(
-  url = "https://www.facebook.com/legal/terms",
+  url = "https://www.facebook.com/terms.php",
   type = "primary")
 dt <- seq(as.Date("2005-12-15"), Sys.Date(), by = "month")
 
 expand_grid(fb_primary_terms, dt) %>%
   # test: first and last two rows
-  group_by(url) %>%
-  slice(c(1:2, (n() - 1):n())) %>%
-  ungroup() %>%
+  # group_by(url) %>%
+  # slice(c(1:2, (n() - 1):n())) %>%
+  # ungroup() %>%
   mutate(
     # do the intiial lookup
     lookup = map2_peacefully(url, dt, request_snapshot),
@@ -320,6 +204,22 @@ expand_grid(fb_primary_terms, dt) %>%
     prim_links = map(prim_scrape, c("result", "links"))) %>%
   unnest(prim_snapshot_dt) ->
 fb_terms_firststage
+
+fb_terms_firststage %>%
+  mutate(
+    label = "Terms of Use",
+    word_count = map_int(prim_words, nrow),
+    link_count = map_int(prim_links, nrow)) %>%
+  # write the processed terms out to csvs
+  {
+    pwalk(
+      select(., terms = prim_words, date = dt, policy = label),
+      save_terms, platform = "facebook")
+  } %>%
+  # now write the stats out
+  select(policy = label, req_dt = dt, req_url = url, snapshot_dt = prim_snapshot_dt,
+    snapshot_url = prim_snapshot_url, word_count, link_count) %>%
+  write_csv(here("data", "facebook-count-primary.csv"))
 ```
 
 Let's find out what the secondary policies are:
