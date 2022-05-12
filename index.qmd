@@ -2,7 +2,7 @@
 title: "Platforms and Power"
 subtitle: "Visualising the changing length of user agreements"
 author: "James Goldie, 360info"
-date: "2022-05-09"
+date: "2022-05-12"
 code-fold: true
 theme: style/article.scss
 ---
@@ -101,6 +101,10 @@ And now the scraping function. One challenge here is that Facebook's policy page
 #'     tidytext::unnest_tokens
 get_words_and_links <- function(snapshot_url, css) {
 
+  if (is_empty(snapshot_url) | is.na(snapshot_url)) {
+    stop("Snapshot URL is missing")
+  }
+
   # extract the snapshot content
   scrape <- read_html(snapshot_url)
 
@@ -134,17 +138,35 @@ get_words_and_links <- function(snapshot_url, css) {
     filter(str_detect(label, coll("support", ignore_case = TRUE),
       negate = TRUE)) ->
   scrape_links_untidy
-  
+
   # remove the fragments from the urls (so that we can detect and remove
   # internal links, like tables of contents)
   fragment(scrape_links_untidy$url) <- NULL
+
+  # we need to fix relative links by getting the snapshot url folder and
+  # prepending it. let's pull that out first
+  snapshot_url_folder <-
+    url_parse(snapshot_url) %>%
+    mutate(path = str_replace(path, "[^/]+$", "")) %>%
+    url_compose()
   
-  # now remove duplicate links (and internal ones)
-  # and clean up white space in labels
   scrape_links_untidy %>%
+    # fix relative links...
+    mutate(url = if_else(
+      is.na(scheme(url)),
+      paste0(snapshot_url_folder, url),
+      url)) %>%
+    # ... and reuplicate and internal ones
     distinct(url, .keep_all = TRUE) %>%
     filter(url != snapshot_url) %>%
-    mutate(label = str_trim(label)) ->
+    # tinally, tidy up labels. if they have "here" in them, replace with the
+    # filename (sans extension)
+    mutate(
+      label = str_trim(label),
+      label = if_else(
+        str_detect(label, "here"),
+        tools::file_path_sans_ext(basename(url)),
+        label)) ->
   scrape_links
   
   # extract the text from the page and break it by paragraph
@@ -199,7 +221,7 @@ analyse_platform <- function(platform, primary_url, start_date, css_tries,
   dt <- seq(start_date, Sys.Date(), by = "month")
   primary_term_history <- expand_grid(primary_terms, dt)
 
-  # if testing, jus ttake the first and last 2 dates for each url
+  # if testing, just take the first and last 2 dates for each url
   if (test) {
     message("TEST MODE ON")
     primary_term_history <-
@@ -218,7 +240,8 @@ analyse_platform <- function(platform, primary_url, start_date, css_tries,
       # do the intiial lookup
       lookup = map2_peacefully(url, dt, request_snapshot),
       prim_snapshot_dt = map(lookup, c("result", "snapshot_dt")),
-      prim_snapshot_url = map_chr(lookup, c("result", "snapshot_url")),
+      prim_snapshot_url = map_chr(lookup, c("result", "snapshot_url"),
+        .default = NA),
       # then scrape the snapshot
       prim_scrape = map_peacefully(prim_snapshot_url, get_words_and_links,
         css = css_tries),
@@ -231,12 +254,20 @@ analyse_platform <- function(platform, primary_url, start_date, css_tries,
         ~ ifelse(!is_empty(.x), nrow(.x), NA_integer_))) ->
   terms_firststage
 
+  message("Checking for scraping errors in primary terms...")
+  terms_firststage %>%
+    filter(has_errors(prim_scrape)) %>%
+    mutate(err = map_chr(prim_scrape, c("error", "message"), .default = NA)) %>%
+    select(dt, prim_scrape, err) %>%
+    print()
+
   message("Writing primary terms of use to disk...")
 
   # write the processed terms out to csvs
   terms_firststage %>%
+    filter(!has_errors(prim_scrape)) %>%
     select(terms = prim_words, date = dt, policy = label) %>%
-    pwalk(save_terms, platform = platform)
+    pmap_peacefully(save_terms, platform = platform)
 
   # --- second round: scrape the discovered links -----------------------------
 
@@ -268,12 +299,20 @@ analyse_platform <- function(platform, primary_url, start_date, css_tries,
         ~ ifelse(!is_empty(.x), nrow(.x), NA_integer_))) ->
   terms_secondary
 
+  message("Checking for scraping errors in primary terms...")
+  terms_secondary %>%
+    filter(has_errors(sec_scrape)) %>%
+    mutate(err = map_chr(sec_scrape, c("error", "message"), .default = NA)) %>%
+    select(dt, label, sec_scrape, err) %>%
+    print()
+
   message("Writing secondary agreements to disk...")
 
   # write the processed terms out to csvs
   terms_secondary %>%
+    filter(!has_errors(sec_scrape)) %>%
     select(terms = sec_words, date = dt, policy = label) %>%
-    pwalk(save_terms, platform = platform)
+    pmap_peacefully(save_terms, platform = platform)
 
   # --- merge primary and secondary terms -------------------------------------
 
@@ -288,7 +327,7 @@ analyse_platform <- function(platform, primary_url, start_date, css_tries,
       select(type, label, url = original_url, dt,
         snapshot_dt = sec_snapshot_dt, snapshot_url = sec_snapshot_url,
         word_count)) %>%
-    rename(policy_name = label, url = target_url, target_dt = dt) ->
+    rename(policy_name = label, target_url = url , target_dt = dt) ->
   terms_all
 
   message("Done!")
@@ -308,6 +347,25 @@ fb_words <- analyse_platform("facebook",
   css_tries = c("section._9lea", "#rebrandBodyID", "#content",
     ".documentation .content", "body table.bordertable[border=\"1\"]",
     "div[role=\"main\"]"))
+```
+
+Let's see what the word counts have looked like over time:
+
+```{r}
+#| label: visfb
+
+ggplot(fb_words) +
+  aes(x = snapshot_dt, y = word_count) +
+  geom_area(aes(fill = type)) +
+  geom_point(aes(colour = type)) +
+  theme_360() +
+  theme(
+    legend.position = c(0.05, 0.95)
+  ) +
+  labs(x = NULL, y = "Word count",
+    title = "Facebook's growing terms"
+    )
+
 ```
 
 
