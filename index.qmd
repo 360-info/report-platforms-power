@@ -347,6 +347,8 @@ fb_words <- analyse_platform("facebook",
   css_tries = c("section._9lea", "#rebrandBodyID", "#content",
     ".documentation .content", "body table.bordertable[border=\"1\"]",
     "div[role=\"main\"]"))
+
+fb_words %>% write_csv(here("data", "terms", "facebook.csv"))
 ```
 
 Let's see what the word counts have looked like over time:
