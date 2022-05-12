@@ -12,6 +12,7 @@ This demo analyses the changing length of the user agreements that major tech co
 
 ```{r}
 library(tidyverse)
+library(urltools)
 library(httr)
 library(rvest)
 library(stringr)
@@ -96,7 +97,8 @@ And now the scraping function. One challenge here is that Facebook's policy page
 #' @return A list containing:
 #'   - dt: the actual date-time of the snapshot
 #'   - url: the url of the snapshot
-#'   - words: a tidy data frame of word tokens as from tidytext::unnest_tokens
+#'   - words: a tidy data frame of word tokens by paragraph, as returned by
+#'     tidytext::unnest_tokens
 get_words_and_links <- function(snapshot_url, css) {
 
   # extract the snapshot content
@@ -119,17 +121,32 @@ get_words_and_links <- function(snapshot_url, css) {
   scrape_content %>%
     html_elements("a") %>%
     { tibble(url = html_attr(., "href"), label = html_text(.)) } %>%
-    # <a> that contain "policy", "policies", "terms"... but not "printable")
+    # <a> based on label
     filter(str_detect(label,
-      regex("terms|policy|policies|notice", ignore_case = TRUE))) %>%
+      regex("terms|policy|policies|notice|procedure|guideline|tips|here",
+        ignore_case = TRUE))) %>%
     filter(str_detect(label, coll("printable", ignore_case = TRUE),
       negate = TRUE)) %>%
     filter(str_detect(label, coll("plain text", ignore_case = TRUE),
       negate = TRUE)) %>%
+    filter(str_detect(label, coll("contact", ignore_case = TRUE),
+      negate = TRUE)) %>%
+    filter(str_detect(label, coll("support", ignore_case = TRUE),
+      negate = TRUE)) ->
+  scrape_links_untidy
+  
+  # remove the fragments from the urls (so that we can detect and remove
+  # internal links, like tables of contents)
+  fragment(scrape_links_untidy$url) <- NULL
+  
+  # now remove duplicate links (and internal ones)
+  # and clean up white space in labels
+  scrape_links_untidy %>%
     distinct(url, .keep_all = TRUE) %>%
+    filter(url != snapshot_url) %>%
     mutate(label = str_trim(label)) ->
   scrape_links
-
+  
   # extract the text from the page and break it by paragraph
   scrape_content %>%
     html_text2() %>%
@@ -137,6 +154,7 @@ get_words_and_links <- function(snapshot_url, css) {
     pluck(1) ->
   scrape_text
 
+  # finally, unnest the words of the agreement
   scrape_text %>%
     tibble(para = 1:length(.), text = .) %>%
     unnest_tokens(word, text) ->
@@ -150,10 +168,12 @@ get_words_and_links <- function(snapshot_url, css) {
 }
 ```
 
-Finally, a quick function to save our processed word counts:
+A quick function to save our processed word counts:
 
 ```{r}
 #| label: savetermsfn
+#| code-fold: true
+#| code-summary: "Show the term saving function"
 
 save_terms <- function(terms, date, policy, platform) {
   dir.create(here("data", "terms", platform, date), recursive = TRUE)
@@ -164,85 +184,155 @@ save_terms <- function(terms, date, policy, platform) {
 }
 ```
 
-## Facebook
+Now, finally, let's encapsulate the higher level tidying:
+
+```{r}
+#| label: analysisfn
+
+analyse_platform <- function(platform, primary_url, start_date, css_tries,
+  test = FALSE) {
+  
+  message("Beginning analysis...")
+
+  # assemble the combos of link requests over time
+  primary_terms <- tibble(url = primary_url, type = "primary")
+  dt <- seq(start_date, Sys.Date(), by = "month")
+  primary_term_history <- expand_grid(primary_terms, dt)
+
+  # if testing, jus ttake the first and last 2 dates for each url
+  if (test) {
+    message("TEST MODE ON")
+    primary_term_history <-
+      primary_term_history %>%
+      group_by(url) %>%
+      slice(c(1:2, (n() - 1):n())) %>%
+      ungroup()
+  }
+
+  # --- first round: scrape the primary terms of use --------------------------
+
+  message("Scraping primary terms of use...")
+
+  primary_term_history %>%
+    mutate(
+      # do the intiial lookup
+      lookup = map2_peacefully(url, dt, request_snapshot),
+      prim_snapshot_dt = map(lookup, c("result", "snapshot_dt")),
+      prim_snapshot_url = map_chr(lookup, c("result", "snapshot_url")),
+      # then scrape the snapshot
+      prim_scrape = map_peacefully(prim_snapshot_url, get_words_and_links,
+        css = css_tries),
+      prim_words = map(prim_scrape, c("result", "words")),
+      prim_links = map(prim_scrape, c("result", "links"))) %>%
+    unnest(prim_snapshot_dt) %>%
+    mutate(
+      label = "Terms of Use",
+      word_count = map_int(prim_words,
+        ~ ifelse(!is_empty(.x), nrow(.x), NA_integer_))) ->
+  terms_firststage
+
+  message("Writing primary terms of use to disk...")
+
+  # write the processed terms out to csvs
+  terms_firststage %>%
+    select(terms = prim_words, date = dt, policy = label) %>%
+    pwalk(save_terms, platform = platform)
+
+  # --- second round: scrape the discovered links -----------------------------
+
+  message("Scraping discovered links...")
+
+  terms_firststage %>%
+    select(dt, prim_links) %>%
+    unnest_longer(prim_links) %>%
+    unpack(prim_links) %>%
+    # discard NAs and duplicate policies
+    distinct(dt, url, .keep_all = TRUE) %>%
+    drop_na(url) %>%
+    mutate(
+      # recover the original link from the wayback-substituted one
+      original_url = str_replace(
+        str_replace(url, fixed("http://web.archive.org"), ""),
+        regex("/web/[:digit:]{14}/"), ""),
+      # do the initial lookup
+      lookup = map2_peacefully(original_url, dt, request_snapshot),
+      sec_snapshot_dt = map(lookup, c("result", "snapshot_dt"), .null = NA),
+      sec_snapshot_url = map_chr(lookup, c("result", "snapshot_url"), .null = NA),
+      sec_scrape = map_peacefully(sec_snapshot_url, get_words_and_links,
+        css = css_tries),
+      sec_words = map(sec_scrape, c("result", "words"))) %>%
+    unnest(sec_snapshot_dt) %>%
+    mutate(
+      type = "secondary",
+      word_count = map_int(sec_words,
+        ~ ifelse(!is_empty(.x), nrow(.x), NA_integer_))) ->
+  terms_secondary
+
+  message("Writing secondary agreements to disk...")
+
+  # write the processed terms out to csvs
+  terms_secondary %>%
+    select(terms = sec_words, date = dt, policy = label) %>%
+    pwalk(save_terms, platform = platform)
+
+  # --- merge primary and secondary terms -------------------------------------
+
+  message("Merging primary and secondary agreement word counts...")
+
+  bind_rows(
+    terms_firststage %>%
+      select(type, label, url, dt,
+        snapshot_dt = prim_snapshot_dt, snapshot_url = prim_snapshot_url,
+        word_count),
+    terms_secondary %>%
+      select(type, label, url = original_url, dt,
+        snapshot_dt = sec_snapshot_dt, snapshot_url = sec_snapshot_url,
+        word_count)) %>%
+    rename(policy_name = label, url = target_url, target_dt = dt) ->
+  terms_all
+
+  message("Done!")
+  return(terms_all)
+}
+```
 
 Now that we have our essential machinery, we can run this scraper - first on Facebook's primary terms of use over time, then on the extracted links!
 
-Here're the CSS selectors that I think capture most of Facebook's redesigns:
+## Facebook
 
 ```{r}
-#| label: fbcss
-fb_css_tries <- c("section._9lea", "#rebrandBodyID", "#content",
-  ".documentation .content", "body table.bordertable[border=\"1\"]",
-  "div[role=\"main\"]")
+#| label: scrapefb
+fb_words <- analyse_platform("facebook",
+  primary_url = "https://www.facebook.com/terms.php",
+  start_date = as.Date("2005-12-15"),
+  css_tries = c("section._9lea", "#rebrandBodyID", "#content",
+    ".documentation .content", "body table.bordertable[border=\"1\"]",
+    "div[role=\"main\"]"))
 ```
 
-Although Waybaack Machine does substitute links in snapshotted terms with snapshotted URLs, I've opted not to use them and to re-request a nearby snapshot from the original link URL, as related policies are not always snapshotted at the exact same time.
+
+## Tinder
+
+https://policies.tinder.com/terms/intl/en
 
 ```{r}
-#| label: fbprimaryscrape
+#| label: scrapetinder
 
-fb_primary_terms <- tibble(
-  url = "https://www.facebook.com/terms.php",
-  type = "primary")
-dt <- seq(as.Date("2005-12-15"), Sys.Date(), by = "month")
-
-expand_grid(fb_primary_terms, dt) %>%
-  # test: first and last two rows
-  # group_by(url) %>%
-  # slice(c(1:2, (n() - 1):n())) %>%
-  # ungroup() %>%
-  mutate(
-    # do the intiial lookup
-    lookup = map2_peacefully(url, dt, request_snapshot),
-    prim_snapshot_dt = map(lookup, c("result", "snapshot_dt")),
-    prim_snapshot_url = map_chr(lookup, c("result", "snapshot_url")),
-    # then scrape the snapshot
-    prim_scrape = map_peacefully(prim_snapshot_url, get_words_and_links,
-      css = fb_css_tries),
-    prim_words = map(prim_scrape, c("result", "words")),
-    prim_links = map(prim_scrape, c("result", "links"))) %>%
-  unnest(prim_snapshot_dt) ->
-fb_terms_firststage
-
-fb_terms_firststage %>%
-  mutate(
-    label = "Terms of Use",
-    word_count = map_int(prim_words, nrow),
-    link_count = map_int(prim_links, nrow)) %>%
-  # write the processed terms out to csvs
-  {
-    pwalk(
-      select(., terms = prim_words, date = dt, policy = label),
-      save_terms, platform = "facebook")
-  } %>%
-  # now write the stats out
-  select(policy = label, req_dt = dt, req_url = url, snapshot_dt = prim_snapshot_dt,
-    snapshot_url = prim_snapshot_url, word_count, link_count) %>%
-  write_csv(here("data", "facebook-count-primary.csv"))
+tinder_words <- analyse_platform("tinder",
+  primary_url = "https://policies.tinder.com/terms/intl/en",
+  start_date = as.Date("2012-08-15"),
+  css_tries = c("#content-main", "#pbody"))
 ```
 
-Let's find out what the secondary policies are:
+## Spotify
+
+https://www.spotify.com/legal/end-user-agreement/
 
 ```{r}
-fb_terms_firststage %>%
-  select(dt, prim_links) %>%
-  unnest_longer(prim_links) %>%
-  unpack(prim_links) %>%
-  # discard NAs and duplicate policies
-  distinct(dt, url, .keep_all = TRUE) %>%
-  mutate(
-    original_url = str_replace(
-      str_replace(url, fixed("http://web.archive.org"), ""),
-      regex("/web/[:digit:]{14}/"), ""),
-    # do the initial lookup
-    lookup = map2_peacefully(original_url, dt, request_snapshot),
-    sec_snapshot_dt = map(lookup, c("result", "snapshot_dt"), .null = NA),
-    sec_snapshot_url = map_chr(lookup, c("result", "snapshot_url"), .null = NA),
-    sec_scrape = map_peacefully(sec_snapshot_url, get_words_and_links,
-      css = fb_css_tries),
-    sec_words = map(sec_scrape, c("result", "words"))) %>%
-  unnest(sec_snapshot_dt) %>%
-  mutate(type = "secondary") ->
-fb_terms_secondary
+#| label: scrapespotify
+
+spotify_words <- analyse_platform("spotify",
+  primary_url = "https://www.spotify.com/legal/end-user-agreement/",
+  start_date = as.Date("2012-08-15"),
+  css_tries = c("#content-main", "#pbody"))
 ```
