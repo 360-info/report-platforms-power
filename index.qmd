@@ -20,6 +20,7 @@ library(tidytext)
 library(lubridate)
 library(collateral)
 library(themes360info)
+library(ggtext)
 library(here)
 ```
 
@@ -139,22 +140,24 @@ get_words_and_links <- function(snapshot_url, css) {
       negate = TRUE)) ->
   scrape_links_untidy
 
-  # remove the fragments from the urls (so that we can detect and remove
-  # internal links, like tables of contents)
+  # remove the fragments and parameters from the urls
+  # (so that we can detect and remove internal links, like tables of contents)
   fragment(scrape_links_untidy$url) <- NULL
+  parameters(scrape_links_untidy$url) <- NULL
 
   # we need to fix relative links by getting the snapshot url folder and
   # prepending it. let's pull that out first
-  snapshot_url_folder <-
+  snapshot_url_site <-
     url_parse(snapshot_url) %>%
-    mutate(path = str_replace(path, "[^/]+$", "")) %>%
+    # mutate(path = str_replace(path, "[^/]+$", "")) %>%
+    mutate(path = "") %>%
     url_compose()
   
   scrape_links_untidy %>%
     # fix relative links...
     mutate(url = if_else(
       is.na(scheme(url)),
-      paste0(snapshot_url_folder, url),
+      paste0(snapshot_url_site, url),
       url)) %>%
     # ... and reuplicate and internal ones
     distinct(url, .keep_all = TRUE) %>%
@@ -211,14 +214,14 @@ Now, finally, let's encapsulate the higher level tidying:
 ```{r}
 #| label: analysisfn
 
-analyse_platform <- function(platform, primary_url, start_date, css_tries,
-  test = FALSE) {
+analyse_platform <- function(platform, primary_url, date_seq, css_tries,
+  scrape_links = TRUE, test = FALSE, primary_name = "Terms of Use") {
   
   message("Beginning analysis...")
 
   # assemble the combos of link requests over time
   primary_terms <- tibble(url = primary_url, type = "primary")
-  dt <- seq(start_date, Sys.Date(), by = "month")
+  dt <- date_seq
   primary_term_history <- expand_grid(primary_terms, dt)
 
   # if testing, just take the first and last 2 dates for each url
@@ -249,7 +252,7 @@ analyse_platform <- function(platform, primary_url, start_date, css_tries,
       prim_links = map(prim_scrape, c("result", "links"))) %>%
     unnest(prim_snapshot_dt) %>%
     mutate(
-      label = "Terms of Use",
+      label = primary_name,
       word_count = map_int(prim_words,
         ~ ifelse(!is_empty(.x), nrow(.x), NA_integer_))) ->
   terms_firststage
@@ -269,66 +272,73 @@ analyse_platform <- function(platform, primary_url, start_date, css_tries,
     select(terms = prim_words, date = dt, policy = label) %>%
     pmap_peacefully(save_terms, platform = platform)
 
-  # --- second round: scrape the discovered links -----------------------------
+  if (scrape_links) {
 
-  message("Scraping discovered links...")
+    # --- second round: scrape the discovered links ---------------------------
 
-  terms_firststage %>%
-    select(dt, prim_links) %>%
-    unnest_longer(prim_links) %>%
-    unpack(prim_links) %>%
-    # discard NAs and duplicate policies
-    distinct(dt, url, .keep_all = TRUE) %>%
-    drop_na(url) %>%
-    mutate(
-      # recover the original link from the wayback-substituted one
-      original_url = str_replace(
-        str_replace(url, fixed("http://web.archive.org"), ""),
-        regex("/web/[:digit:]{14}/"), ""),
-      # do the initial lookup
-      lookup = map2_peacefully(original_url, dt, request_snapshot),
-      sec_snapshot_dt = map(lookup, c("result", "snapshot_dt"), .null = NA),
-      sec_snapshot_url = map_chr(lookup, c("result", "snapshot_url"), .null = NA),
-      sec_scrape = map_peacefully(sec_snapshot_url, get_words_and_links,
-        css = css_tries),
-      sec_words = map(sec_scrape, c("result", "words"))) %>%
-    unnest(sec_snapshot_dt) %>%
-    mutate(
-      type = "secondary",
-      word_count = map_int(sec_words,
-        ~ ifelse(!is_empty(.x), nrow(.x), NA_integer_))) ->
-  terms_secondary
+    message("Scraping discovered links...")
 
-  message("Checking for scraping errors in primary terms...")
-  terms_secondary %>%
-    filter(has_errors(sec_scrape)) %>%
-    mutate(err = map_chr(sec_scrape, c("error", "message"), .default = NA)) %>%
-    select(dt, label, sec_scrape, err) %>%
-    print()
-
-  message("Writing secondary agreements to disk...")
-
-  # write the processed terms out to csvs
-  terms_secondary %>%
-    filter(!has_errors(sec_scrape)) %>%
-    select(terms = sec_words, date = dt, policy = label) %>%
-    pmap_peacefully(save_terms, platform = platform)
-
-  # --- merge primary and secondary terms -------------------------------------
-
-  message("Merging primary and secondary agreement word counts...")
-
-  bind_rows(
     terms_firststage %>%
-      select(type, label, url, dt,
-        snapshot_dt = prim_snapshot_dt, snapshot_url = prim_snapshot_url,
-        word_count),
+      select(dt, prim_links) %>%
+      unnest_longer(prim_links) %>%
+      unpack(prim_links) %>%
+      # discard NAs and duplicate policies
+      distinct(dt, url, .keep_all = TRUE) %>%
+      drop_na(url) %>%
+      mutate(
+        # recover the original link from the wayback-substituted one
+        original_url = str_replace(
+          str_replace(url, fixed("http://web.archive.org"), ""),
+          regex("/web/[:digit:]{14}/"), ""),
+        # do the initial lookup
+        lookup = map2_peacefully(original_url, dt, request_snapshot),
+        sec_snapshot_dt = map(lookup, c("result", "snapshot_dt"), .null = NA),
+        sec_snapshot_url = map_chr(lookup, c("result", "snapshot_url"), .null = NA),
+        sec_scrape = map_peacefully(sec_snapshot_url, get_words_and_links,
+          css = css_tries),
+        sec_words = map(sec_scrape, c("result", "words"))) %>%
+      unnest(sec_snapshot_dt) %>%
+      mutate(
+        type = "secondary",
+        word_count = map_int(sec_words,
+          ~ ifelse(!is_empty(.x), nrow(.x), NA_integer_))) ->
+    terms_secondary
+
+    message("Checking for scraping errors in primary terms...")
     terms_secondary %>%
-      select(type, label, url = original_url, dt,
-        snapshot_dt = sec_snapshot_dt, snapshot_url = sec_snapshot_url,
-        word_count)) %>%
-    rename(policy_name = label, target_url = url , target_dt = dt) ->
-  terms_all
+      filter(has_errors(sec_scrape)) %>%
+      mutate(err = map_chr(sec_scrape, c("error", "message"), .default = NA)) %>%
+      select(dt, label, sec_scrape, err) %>%
+      print()
+
+    message("Writing secondary agreements to disk...")
+
+    # write the processed terms out to csvs
+    terms_secondary %>%
+      filter(!has_errors(sec_scrape)) %>%
+      select(terms = sec_words, date = dt, policy = label) %>%
+      pmap_peacefully(save_terms, platform = platform)
+
+    message("Merging primary and secondary agreement word counts...")
+    terms_all <-
+      bind_rows(
+        terms_firststage %>%
+          select(type, label, url, dt, scrape = prim_scrape,
+            snapshot_dt = prim_snapshot_dt, snapshot_url = prim_snapshot_url,
+            word_count),
+        terms_secondary %>%
+          select(type, label, url = original_url, dt, scrape = sec_scrape,
+            snapshot_dt = sec_snapshot_dt, snapshot_url = sec_snapshot_url,
+            word_count)) %>%
+      rename(policy_name = label, target_url = url , target_dt = dt)
+
+  } else {
+    terms_all <-
+      terms_firststage %>%
+      select(type, label, url, dt, scrape = prim_scrape,
+        snapshot_dt = prim_snapshot_dt, snapshot_url = prim_snapshot_url,
+        word_count)
+  }
 
   message("Done!")
   return(terms_all)
@@ -340,34 +350,120 @@ Now that we have our essential machinery, we can run this scraper - first on Fac
 ## Facebook
 
 ```{r}
-#| label: scrapefb
-fb_words <- analyse_platform("facebook",
-  primary_url = "https://www.facebook.com/terms.php",
-  start_date = as.Date("2005-12-15"),
-  css_tries = c("section._9lea", "#rebrandBodyID", "#content",
-    ".documentation .content", "body table.bordertable[border=\"1\"]",
-    "div[role=\"main\"]"))
+#| label: setupfb
+fb_css <- c("section._9lea", "#rebrandBodyID", "#content", "#PolicyPageContent",
+  "#u_0_2_hz", "#u_0_9_uG", 
+  ".documentation .content", "body table.bordertable[border=\"1\"]",
+  "div[role=\"main\"]")
 
-fb_words %>% write_csv(here("data", "terms", "facebook.csv"))
+analyse_facebook <- partial(analyse_platform,
+  platform = "facebook",
+  date_seq = seq(as.Date("2005-12-15"), Sys.Date(), by = "month"),
+  css_tries = fb_css)
+```
+
+```{r}
+#| label: scrapefb
+
+fb_words <- analyse_facebook(primary_url = "https://www.facebook.com/terms.php")
+fb_words %>%
+  select(-scrape) %>%
+  filter(word_count > 250) %>%
+  filter(str_detect(snapshot_url, coll("german"), negate = TRUE)) %>%
+  filter(str_detect(snapshot_url, coll("help.php?page=926"), negate = TRUE)) %>%
+  group_by(target_dt) %>%
+  distinct(snapshot_url, .keep_all = TRUE) %>%
+  write_csv(here("data", "terms", "facebook.csv")) ->
+fb_words_tidy
+```
+
+It looks like we still have some duplicate policies, where things like "Platform Policy" and "Platform Policies" have come out as distinct. Let's file those down:
+
+```{r}
+fb_words %>%
+  filter(word_count > 250) %>%
+  filter(between(target_dt, as.Date("2008-01-01"), as.Date("2009-09-01"))) %>%
+  filter(target_dt == max(target_dt)) %>%
+  select(policy_name, word_count, snapshot_url) %>%
+  print() %>%
+  pull(snapshot_url)
+  
+  group_by(target_dt) %>%
+  distinct(snapshot_url)
+
+```
+
+But it looks like some policies inadvertently scraped 404 pages or bad redirection pages:
+
+```{r}
+fb_words %>% filter(word_count < 100)
+
+fb_words %>% filter(word_count < 100) %>% pull(target_url) %>% unique()
+```
+
+I'll try to scrape those manually:
+
+```{r}
+#| label: manualfbscrape
+fb_words_pagesgroups <- analyse_facebook(
+  primary_url = "https://www.facebook.com/policies_center/pages_groups_events",
+  primary_name = "Pages, Groups, and Events",
+  scrape_links = "FALSE")
+fb_words_ads <- analyse_facebook(
+  primary_url = "https://www.facebook.com/policies/ads/",
+  primary_name = "Advertising Policies",
+  scrape_links = "FALSE")
 ```
 
 Let's see what the word counts have looked like over time:
 
 ```{r}
 #| label: visfb
-
-ggplot(fb_words) +
-  aes(x = snapshot_dt, y = word_count) +
-  geom_area(aes(fill = type)) +
-  geom_point(aes(colour = type)) +
-  theme_360() +
-  theme(
-    legend.position = c(0.05, 0.95)
-  ) +
-  labs(x = NULL, y = "Word count",
-    title = "Facebook's growing terms"
-    )
-
+fb_words_tidy %>%
+  group_by(type, target_dt) %>%
+  summarise(word_count = sum(word_count, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(type =
+    if_else(type == "primary", "Primary terms", "Secondary agreements")) %>%
+  {
+    ggplot(.) +
+      aes(x = target_dt, y = word_count) +
+      geom_area(aes(fill = type) , position = position_stack(reverse = TRUE)) +
+      # geom_point(aes(colour = type)) +
+      # scale_fill_brewer(type = "qual") +
+      scale_fill_manual(
+        values = c(
+          "Primary terms" = "#4267b2",
+          "Secondary agreements" = "#93d1f5"),
+        guide = NULL) +
+      scale_y_continuous(
+        labels = scales::label_number(scale = 1/1000, suffix = "k words")) +
+      annotate_360_glasslight(
+        x = as.Date("2018-01-01"), y = 1500, size = 4,
+        label = "<span style=\"color:white;\">**PRIMARY TERMS**</span>"
+      ) +
+      annotate_360_glasslight(
+        x = as.Date("2018-01-01"), y = 8000, size = 4,
+        label = "<span style=\"color:#4267b2;\">**SECONDARY AGREEMENTS**</span>"
+      ) +
+      theme_360() +
+      theme(
+        legend.position = c(0.5, 0.85),
+        legend.direction = "horizontal",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        plot.subtitle = element_markdown(family = "Body 360info", face = "plain")
+      ) +
+      labs(x = NULL, y = NULL, fill = NULL,
+        title = toupper("Facebook's growing fine print"),
+        subtitle = paste(
+          "Since beginning in 2005, Facebook's terms of service have grown from **two policies under",
+          "3 000 words** into a behomoth comprising **at least nine policies and nearly 30 000 words.**",
+          sep = "<br>"),
+        caption = "**CHART:** James Goldie, 360info")
+  } %>%
+  save_360plot(here("out", "wordcounts-facebook.png"), shape = "sdtv-landscape")
 ```
 
 
@@ -376,12 +472,24 @@ ggplot(fb_words) +
 https://policies.tinder.com/terms/intl/en
 
 ```{r}
+#| label: setuptinder
+tinder_css <- c("main", "body")
+
+analyse_tinder <- partial(analyse_platform,
+  platform = "tinder",
+  css_tries = tinder_css)
+```
+
+```{r}
 #| label: scrapetinder
 
-tinder_words <- analyse_platform("tinder",
+tinder_words_old <- analyse_tinder(
+  primary_url = "https://gotinder.com/terms",
+  date_seq = seq(as.Date("2013-03-01"), as.Date("2020-07-01"), by = "month"))
+tinder_words_new <- analyse_tinder(
   primary_url = "https://policies.tinder.com/terms/intl/en",
-  start_date = as.Date("2012-08-15"),
-  css_tries = c("#content-main", "#pbody"))
+  date_seq = seq(as.Date("2017-08-01"), Sys.Date(), by = "month"))
+
 ```
 
 ## Spotify
@@ -389,10 +497,18 @@ tinder_words <- analyse_platform("tinder",
 https://www.spotify.com/legal/end-user-agreement/
 
 ```{r}
+#| label: setupspotify
+spotify_css <- css = css_tries = c("#content-main", "#pbody")
+
+analyse_spotify <- partial(analyse_platform,
+  platform = "spotify",
+  start_date = as.Date("2012-08-15")
+  css_tries = tinder_css)
+```
+
+```{r}
 #| label: scrapespotify
 
-spotify_words <- analyse_platform("spotify",
-  primary_url = "https://www.spotify.com/legal/end-user-agreement/",
-  start_date = as.Date("2012-08-15"),
-  css_tries = c("#content-main", "#pbody"))
+spotify_words <- analyse_spotify(
+  primary_url = "https://www.spotify.com/au/legal/end-user-agreement/")
 ```
