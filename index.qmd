@@ -66,6 +66,7 @@ request_snapshot <- function(url, dt) {
   if (response$status != 200L) {
     warning(paste("HTTP", response$status, "thrown"))
   }
+  # print(content(response))
   is_available <- content(response)$archived_snapshots$closest$available
   if (is_empty(is_available) || (!is_available)) {
     stop("No snapshot available")
@@ -436,7 +437,6 @@ fb_words_tidy %>%
   save_360plot(here("out", "wordcounts-facebook.svg"), shape = "sdtv-landscape")
 ```
 
-
 ## Tinder
 
 https://policies.tinder.com/terms/intl/en
@@ -460,7 +460,17 @@ tinder_words_new <- analyse_tinder(
   primary_url = "https://policies.tinder.com/terms/intl/en",
   date_seq = seq(as.Date("2017-08-01"), Sys.Date(), by = "month"))
 
-tinder_words_all <- bind_rows(tinder_words_old, tinder_words_new)
+tinder_words_all <-
+  bind_rows(tinder_words_old, tinder_words_new) %>%
+  filter(!has_errors(scrape)) %>%
+  group_by(target_dt) %>%
+  distinct(snapshot_url, .keep_all = TRUE) %>%
+  ungroup() ->
+tinder_words_tidy
+
+tinder_words_tidy %>%
+  select(-scrape) %>%
+  write_csv(here("data", "terms", "tinder.csv"))
 
 ```
 
@@ -468,7 +478,7 @@ Let's see what the word counts have looked like over time:
 
 ```{r}
 #| label: visfb
-tinder_words_all %>%
+tinder_words_tidy %>%
   group_by(type, target_dt) %>%
   summarise(word_count = sum(word_count, na.rm = TRUE)) %>%
   ungroup() %>%
@@ -512,7 +522,7 @@ tinder_words_all %>%
           sep = "<br>"),
         caption = "**CHART:** James Goldie, 360info")
   } %>%
-  save_360plot(here("out", "wordcounts-facebook.png"), shape = "sdtv-landscape")
+  save_360plot(here("out", "wordcounts-tinder.png"), shape = "sdtv-landscape")
 ```
 
 ## Spotify
@@ -521,17 +531,150 @@ https://www.spotify.com/legal/end-user-agreement/
 
 ```{r}
 #| label: setupspotify
-spotify_css <- css = css_tries = c("#content-main", "#pbody")
+spotify_css <- c(
+  paste(
+    "#content-main .container > h1, #content-main .container > h2, ",
+    "#content-main .container > p, #content-main .container > li, ",
+    "#content-main .container td"),
+  "#pbody")
 
 analyse_spotify <- partial(analyse_platform,
   platform = "spotify",
-  start_date = as.Date("2012-08-15")
-  css_tries = tinder_css)
+  date_seq = seq(as.Date("2011-08-12"), Sys.Date(), by = "month"),
+  css_tries = spotify_css)
 ```
 
 ```{r}
 #| label: scrapespotify
 
-spotify_words <- analyse_spotify(
-  primary_url = "https://www.spotify.com/au/legal/end-user-agreement/")
+spotify_words <-
+  analyse_spotify(
+    primary_url = "https://www.spotify.com/us/legal/end-user-agreement/")
+
+# let's reprocess the ones that had errors:
+# spotify_words_copyright <-
+#   analyse_spotify(
+#     primary_url = "https://www.spotify.com/us/legal/copyright-policy",
+#     primary_name = "Copyright Policy",
+#     scrape_links = FALSE) %>%
+#   mutate(type = "secondary")
+
+spotify_words_copyright <-
+  analyse_spotify(
+    primary_url = "https://www.spotify.com/us/legal/copyright-policy",
+    primary_name = "Copyright Policy",
+    scrape_links = FALSE) %>%
+  mutate(type = "secondary")
+
+# spotify_words_userguidelines <-
+#   analyse_spotify(
+#     primary_url = "https://www.spotify.com/legal/user-guidelines",
+#     primary_name = "Spotify User Guidelines",
+#     scrape_links = FALSE)
+
+# combine them
+spotify_words %>%
+  filter(!has_errors(scrape)) %>%
+  filter(str_detect(snapshot_url, "links", negate = TRUE)) %>%
+  filter(str_detect(snapshot_url, "contact", negate = TRUE)) %>%
+  # privacy policies after 2018 only partially scraping :(
+  filter(!(
+    policy_name == "Privacy Policy" &
+    target_dt > as.Date("2018-12-12"))) %>%
+  # after 2020 not scraping properly :(
+  filter(target_dt <= as.Date("2020-12-12")) %>%
+  select(-scrape) ->
+spotify_words_tidy
+
+# current privacy policy to be tacked on
+"https://www.spotify.com/us/legal/privacy-policy/" %>%
+  read_html() %>%
+  html_element("#content-main") %>%
+  html_text2() %>%
+  paste(collapse = "\n\n") %>%
+  str_split(regex("\n+")) %>%
+  pluck(1) %>%
+    tibble(para = 1:length(.), text = .) %>%
+    unnest_tokens(word, text) ->
+spotify_privacy_current
+
+# tack the new ones on
+spotify_words_tidy %>%
+  bind_rows(tibble(
+    type = "secondary"
+  ))
+
+spotify_words_tidy %>% write_csv(here("data", "terms", "spotify.csv"))
+```
+
+```{r}
+#| label: visspotify
+spotify_words_tidy %>%
+  group_by(type, target_dt) %>%
+  summarise(word_count = sum(word_count, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(type =
+    if_else(type == "primary", "Primary terms", "Secondary agreements")) %>%
+  {
+    ggplot(.) +
+      aes(x = target_dt, y = word_count) +
+      geom_area(aes(fill = type) , position = position_stack(reverse = TRUE)) +
+      # geom_point(aes(colour = type)) +
+      # scale_fill_brewer(type = "qual") +
+      scale_fill_manual(
+        values = c(
+          "Primary terms" = "black",
+          "Secondary agreements" = "#1DB954"),
+        guide = NULL) +
+      scale_y_continuous(
+        labels = scales::label_number(scale = 1/1000, suffix = "k words")) +
+      annotate_360_glasslight(
+        x = as.Date("2018-01-01"), y = 1500, size = 4,
+        label = "<span style=\"color:white;\">**PRIMARY TERMS**</span>"
+      ) +
+      annotate_360_glasslight(
+        x = as.Date("2018-01-01"), y = 8000, size = 4,
+        label = "<span style=\"color:black;\">**SECONDARY AGREEMENTS**</span>"
+      ) +
+      theme_360() +
+      theme(
+        legend.position = c(0.5, 0.85),
+        legend.direction = "horizontal",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        plot.subtitle = element_markdown(family = "Body 360info", face = "plain")
+      ) +
+      labs(x = NULL, y = NULL, fill = NULL,
+        title = toupper("Spotify's growing fine print"),
+        subtitle = paste(
+          "Since beginning in 2013, Spotify's terms of service have grown from **two policies around",
+          "4 000 words** into a behomoth comprising **at least nine policies and nearly 30 000 words.**",
+          sep = "<br>"),
+        caption = "**CHART:** James Goldie, 360info")
+  } %>%
+  save_360plot(here("out", "wordcounts-spotify.png"), shape = "sdtv-landscape")
+```
+
+## Twitter
+
+from 2017: https://twitter.com/tos
+
+Note that Twitter has [a page linking directly to its previous Terms of Service versions](https://twitter.com/en/tos/previous), but most of the links on it appear to be broken.
+
+```{r}
+#| label: setupstwitter
+
+twitter_css <- c(
+  "#twtr-main .ct07-chapters:nth-child(1)",
+  # bit fragile to specifically select first 70 children,
+  # but it's hard to use css when multiple sets of terms are in one block!
+  ".Field-items-item :nth-child(-n+70)",
+  "#pageContent",
+  "#content")
+
+analyse_twitter <- partial(analyse_platform,
+  platform = "twitter",
+  date_seq = seq(as.Date("2007-08-12"), Sys.Date(), by = "month"),
+  css_tries = twitter_css)
 ```
