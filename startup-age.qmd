@@ -14,6 +14,7 @@ library(tidyverse)
 library(lubridate)
 library(here)
 library(themes360info)
+library(ggtext)
 ```
 
 This data comes "wide", with columns for each month's observation. We're going to pivot it long,
@@ -41,13 +42,14 @@ Now, let's visualise it! To increase clarity, let's put the focus on the first y
 ```{r}
 #| label: vis
 
-hl_years <- c(2005, 2018)
+hl_years <- c(2005, 2008, 2018)
 
 line_colours <-
   rep(colours_360("darkgrey"), length(unique(survival$birth_year))) %>%
   set_names(unique(survival$birth_year))
-line_colours["2005"] <- "#2166ac"
-line_colours["2018"] <- "#e41a1c"
+line_colours["2005"]  <- "#2166ac"
+line_colours["2008"] <- "orange"
+line_colours["2018"]  <- "#e41a1c"
 
 survival %>%
   mutate(
@@ -58,22 +60,16 @@ survival %>%
     ggplot(.) +
       aes(x = age_yrs, y = survived, colour = factor(birth_year), group = factor(birth_year)) +
       geom_line(aes(alpha = year_alpha, size = year_width)) +
-      annotate_360_glasslight(
-        x = 5, y = 0.8, size = 5, hjust = "left",
-        label = paste0(
-          "Around **half** of the startups that began in <span style=\"color:",
-          "#2166ac", ";\">**2005**</span><br>",
-          "are still around 15 years later...")) +
-      annotate_360_glasslight(
-        x = 5, y = 0.4, size = 5, hjust = "left",
-        label = paste(
-          "... but since then fewer and fewer startups",
-          "have survived their first few years.", sep = "<br>")) +
-      annotate_360_glasslight(
-        x = 1.5, y = 0.15, size = 5, hjust = "left",
-        label = paste(
-          "**Fewer than 10%** of the startups from <span style=\"color:#e41a1c;\">**2018**</span>",
-          "were still around just two years later.", sep = "<br>")) +
+      geom_richtext(aes(label = paste0("Websites from<br>**", birth_year, "**")),
+        data = . %>%
+          filter(birth_year %in% hl_years) %>%
+          group_by(birth_year) %>%
+          arrange(desc(age_yrs)) %>%
+          slice(1) %>%
+          ungroup(),
+        family = "Body 360info", fontface = "plain",
+        hjust = "left", nudge_x = 0.2, label.colour = NA, fill = NA) +
+      scale_x_continuous(expand = expansion(add = c(0, 2.5))) +
       scale_y_continuous(labels = scales::label_percent()) +
       scale_alpha_identity() +
       scale_size_identity() +
@@ -82,14 +78,22 @@ survival %>%
       theme(
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
-        panel.grid.minor.y = element_blank()) +
+        panel.grid.minor.y = element_blank(),
+        plot.subtitle = element_markdown(
+          family = "Body 360info", face = "plain")) +
       labs(
-        x = "Startup age", y = "Survival rate",
-        title = toupper("STARTUP SURVIVAL"),
+        x = "Website age", y = "Survival rate",
+        title = toupper("WEBSITE SURVIVAL"),
+        subtitle = paste(
+          "Around **half of the <span style=\"color:#2166ac;\">websites that began in 2005</span>** are still around 15 years later.",
+          "But since then fewer and fewer websites have survived past their first few years.",
+          "**Over 90% of the <span style=\"color:#e41a1c;\">websites that launched in 2018</span> failed** within two years.",
+          sep = "<br>"),
         caption = paste(
           "**CHART:** James Goldie, 306info",
           "**ADAPTED** from McCarthy et al. 2020",
           "doi.org/10.1371/journal.pone.0249993", sep = "<br>"))
   } %>%
-  save_360plot(here("out", "startup-survival.png"), shape = "sdtv-landscape")
+  save_360plot(here("out", "startup-survival.png"), shape = "sdtv-landscape") %>%
+  save_360plot(here("out", "startup-survival.svg"), shape = "sdtv-landscape") 
 ```
