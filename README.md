@@ -2,6 +2,8 @@
 
 Visualises the growing terms of service employed by tech platforms, as well as the declining survival rates of websites.
 
+![In 2005, Facebook's terms of service comprised two policies totalling under 3 000 words. Since then, they've grown tenfold into a behomoth comprising at least nine policies.](https://github.com/360-info/report-platforms-power/raw/main/out/wordcounts-facebook.png)
+
 ## Use + Remix rights
 
 ![[Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0)](https://mirrors.creativecommons.org/presskit/buttons/80x15/png/by.png)
