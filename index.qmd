@@ -559,12 +559,12 @@ spotify_words <-
 #     scrape_links = FALSE) %>%
 #   mutate(type = "secondary")
 
-spotify_words_copyright <-
-  analyse_spotify(
-    primary_url = "https://www.spotify.com/us/legal/copyright-policy",
-    primary_name = "Copyright Policy",
-    scrape_links = FALSE) %>%
-  mutate(type = "secondary")
+# spotify_words_copyright <-
+#   analyse_spotify(
+#     primary_url = "https://www.spotify.com/us/legal/copyright-policy",
+#     primary_name = "Copyright Policy",
+#     scrape_links = FALSE) %>%
+#   mutate(type = "secondary")
 
 # spotify_words_userguidelines <-
 #   analyse_spotify(
@@ -582,11 +582,14 @@ spotify_words %>%
     policy_name == "Privacy Policy" &
     target_dt > as.Date("2018-12-12"))) %>%
   # after 2020 not scraping properly :(
-  filter(target_dt <= as.Date("2020-12-12")) %>%
+  filter(target_dt <= as.Date("2019-12-12")) %>%
   select(-scrape) ->
 spotify_words_tidy
 
-# current privacy policy to be tacked on
+
+# the privacy policy isn't fully scraping since 2019, so we're going to use
+# the current figure from then on instead
+
 "https://www.spotify.com/us/legal/privacy-policy/" %>%
   read_html() %>%
   html_element("#content-main") %>%
@@ -595,21 +598,28 @@ spotify_words_tidy
   str_split(regex("\n+")) %>%
   pluck(1) %>%
     tibble(para = 1:length(.), text = .) %>%
-    unnest_tokens(word, text) ->
+    unnest_tokens(word, text) %>%
+  write_csv(
+    here("data", "terms", "spotify", "2019-12-12", "privacy-policy-CURRENT.csv")) %>%
+  print() ->
 spotify_privacy_current
 
 # tack the new ones on
 spotify_words_tidy %>%
   bind_rows(tibble(
-    type = "secondary"
-  ))
+    type = "secondary",
+    policy_name = "Privacy Policy",
+    target_url = "https://www.spotify.com/us/legal/privacy-policy/",
+    target_dt = seq(as.Date("2019-01-12"), as.Date("2019-12-12"), by = "month"),
+    word_count = nrow(spotify_privacy_current))) ->
+spotify_words_patched
 
-spotify_words_tidy %>% write_csv(here("data", "terms", "spotify.csv"))
+spotify_words_patched %>% write_csv(here("data", "terms", "spotify.csv"))
 ```
 
 ```{r}
 #| label: visspotify
-spotify_words_tidy %>%
+spotify_words_patched %>%
   group_by(type, target_dt) %>%
   summarise(word_count = sum(word_count, na.rm = TRUE)) %>%
   ungroup() %>%
@@ -627,13 +637,13 @@ spotify_words_tidy %>%
           "Secondary agreements" = "#1DB954"),
         guide = NULL) +
       scale_y_continuous(
-        labels = scales::label_number(scale = 1/1000, suffix = "k words")) +
+        labels = scales::label_number(accuracy = 1, scale = 1/1000, suffix = "k words")) +
       annotate_360_glasslight(
-        x = as.Date("2018-01-01"), y = 1500, size = 4,
+        x = as.Date("2017-06-01"), y = 3500, size = 4,
         label = "<span style=\"color:white;\">**PRIMARY TERMS**</span>"
       ) +
       annotate_360_glasslight(
-        x = as.Date("2018-01-01"), y = 8000, size = 4,
+        x = as.Date("2017-06-01"), y = 10000, size = 4,
         label = "<span style=\"color:black;\">**SECONDARY AGREEMENTS**</span>"
       ) +
       theme_360() +
@@ -648,8 +658,8 @@ spotify_words_tidy %>%
       labs(x = NULL, y = NULL, fill = NULL,
         title = toupper("Spotify's growing fine print"),
         subtitle = paste(
-          "Since beginning in 2013, Spotify's terms of service have grown from **two policies around",
-          "4 000 words** into a behomoth comprising **at least nine policies and nearly 30 000 words.**",
+          "Since beginning in 2013, Spotify's terms of service have grown to **over 10 000 words,**",
+          "including several changing secondary agreements.",
           sep = "<br>"),
         caption = "**CHART:** James Goldie, 360info")
   } %>%
@@ -675,6 +685,12 @@ twitter_css <- c(
 
 analyse_twitter <- partial(analyse_platform,
   platform = "twitter",
-  date_seq = seq(as.Date("2007-08-12"), Sys.Date(), by = "month"),
+  date_seq = seq(as.Date("2007-02-15"), Sys.Date(), by = "month"),
   css_tries = twitter_css)
+```
+
+```{r}
+#| label: scrapetwitter
+
+twitter_words <- analyse_twitter(primary_url = "https://www.twitter.com/tos")
 ```
