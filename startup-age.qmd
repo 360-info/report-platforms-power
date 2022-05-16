@@ -90,7 +90,7 @@ survival %>%
           "**Over 90% of the <span style=\"color:#e41a1c;\">websites that launched in 2018</span> failed** within two years.",
           sep = "<br>"),
         caption = paste(
-          "**CHART:** James Goldie, 306info",
+          "**CHART:** James Goldie, 360info",
           "**ADAPTED** from McCarthy et al. 2020",
           "doi.org/10.1371/journal.pone.0249993", sep = "<br>"))
   } %>%
