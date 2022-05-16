@@ -1,0 +1,99 @@
+---
+title: "Platforms and Power"
+subtitle: "Visualising the age to which online startups survive"
+author: "James Goldie, 360info. Data: Paul McCarthy"
+date: "2022-05-12"
+code-fold: true
+theme: style/article.scss
+---
+
+This analysis reproduces and refines [a graphic of the falling startup survival rates](https://github.com/behavioral-ds/online-diversity/blob/main/scripts/plot_fig6.R) from [McCarthy et al. 2020](https://github.com/behavioral-ds/online-diversity).
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(here)
+library(themes360info)
+library(ggtext)
+```
+
+This data comes "wide", with columns for each month's observation. We're going to pivot it long,
+then calculate the age of startups at any given time.
+
+```{r}
+#| label: tidy
+
+survival <-
+  read_csv(here("data", "species-survival.csv")) %>%
+  rename(birth_year = "...1") %>%
+  pivot_longer(-birth_year, names_to = "time", values_to = "survived") %>%
+  # calculate the age at any given moment
+  mutate(
+    birth = ymd(paste0(birth_year, "-01-01")),
+    time = ymd(paste0(time, "-01")),
+    age_yrs = (birth %--% time) / years(1)) %>%
+  filter(!is.na(survived)) %>%
+  select(birth_year, time, age_yrs, survived) %>%
+  print()
+```
+
+Now, let's visualise it! To increase clarity, let's put the focus on the first year, 2005, and on the most current, 2019:
+
+```{r}
+#| label: vis
+
+hl_years <- c(2005, 2008, 2018)
+
+line_colours <-
+  rep(colours_360("darkgrey"), length(unique(survival$birth_year))) %>%
+  set_names(unique(survival$birth_year))
+line_colours["2005"]  <- "#2166ac"
+line_colours["2008"] <- "orange"
+line_colours["2018"]  <- "#e41a1c"
+
+survival %>%
+  mutate(
+    year_alpha = if_else(birth_year %in% hl_years, 1, 0.15),
+    year_width = if_else(birth_year %in% hl_years, 1.5, 0.75),
+    ) %>%
+  {
+    ggplot(.) +
+      aes(x = age_yrs, y = survived, colour = factor(birth_year), group = factor(birth_year)) +
+      geom_line(aes(alpha = year_alpha, size = year_width)) +
+      geom_richtext(aes(label = paste0("Websites from<br>**", birth_year, "**")),
+        data = . %>%
+          filter(birth_year %in% hl_years) %>%
+          group_by(birth_year) %>%
+          arrange(desc(age_yrs)) %>%
+          slice(1) %>%
+          ungroup(),
+        family = "Body 360info", fontface = "plain",
+        hjust = "left", nudge_x = 0.2, label.colour = NA, fill = NA) +
+      scale_x_continuous(expand = expansion(add = c(0, 2.5))) +
+      scale_y_continuous(labels = scales::label_percent()) +
+      scale_alpha_identity() +
+      scale_size_identity() +
+      scale_colour_manual(values = line_colours, guide = NULL) +
+      theme_360() +
+      theme(
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        plot.subtitle = element_markdown(
+          family = "Body 360info", face = "plain")) +
+      labs(
+        x = "Website age", y = "Survival rate",
+        title = toupper("WEBSITE SURVIVAL"),
+        subtitle = paste(
+          "Around **half of the <span style=\"color:#2166ac;\">websites that began in 2005</span>** are still around 15 years later.",
+          "But since then fewer and fewer websites have survived past their first few years.",
+          "**Over 90% of the <span style=\"color:#e41a1c;\">websites that launched in 2018</span> failed** within two years.",
+          sep = "<br>"),
+        caption = paste(
+          "**CHART:** James Goldie, 360info",
+          "**ADAPTED** from McCarthy et al. 2020",
+          "doi.org/10.1371/journal.pone.0249993", sep = "<br>"))
+  } %>%
+  save_360plot(here("out", "startup-survival.png"), shape = "sdtv-landscape") %>%
+  save_360plot(here("out", "startup-survival.svg"), shape = "sdtv-landscape") 
+```

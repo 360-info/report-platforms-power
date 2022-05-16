@@ -1,0 +1,228 @@
+type,policy_name,target_url,target_dt,snapshot_dt,snapshot_url,word_count
+primary,Terms of Use,https://gotinder.com/terms,2013-03-01,2013-04-01T00:30:35Z,http://web.archive.org/web/20130401003035/http://www.gotinder.com:80/terms/,3152
+primary,Terms of Use,https://gotinder.com/terms,2013-04-01,2013-04-01T00:30:35Z,http://web.archive.org/web/20130401003035/http://www.gotinder.com:80/terms/,3152
+primary,Terms of Use,https://gotinder.com/terms,2013-05-01,2013-04-01T00:30:35Z,http://web.archive.org/web/20130401003035/http://www.gotinder.com:80/terms/,3152
+primary,Terms of Use,https://gotinder.com/terms,2013-06-01,2013-04-01T00:30:35Z,http://web.archive.org/web/20130401003035/http://www.gotinder.com:80/terms/,3152
+primary,Terms of Use,https://gotinder.com/terms,2013-07-01,2013-04-01T00:30:35Z,http://web.archive.org/web/20130401003035/http://www.gotinder.com:80/terms/,3152
+primary,Terms of Use,https://gotinder.com/terms,2013-08-01,2013-04-01T00:30:35Z,http://web.archive.org/web/20130401003035/http://www.gotinder.com:80/terms/,3152
+primary,Terms of Use,https://gotinder.com/terms,2013-09-01,2013-04-01T00:30:35Z,http://web.archive.org/web/20130401003035/http://www.gotinder.com:80/terms/,3152
+primary,Terms of Use,https://gotinder.com/terms,2013-10-01,2013-04-01T00:30:35Z,http://web.archive.org/web/20130401003035/http://www.gotinder.com:80/terms/,3152
+primary,Terms of Use,https://gotinder.com/terms,2013-11-01,2013-04-01T00:30:35Z,http://web.archive.org/web/20130401003035/http://www.gotinder.com:80/terms/,3152
+primary,Terms of Use,https://gotinder.com/terms,2013-12-01,2013-04-01T00:30:35Z,http://web.archive.org/web/20130401003035/http://www.gotinder.com:80/terms/,3152
+primary,Terms of Use,https://gotinder.com/terms,2014-01-01,2014-02-09T01:25:25Z,http://web.archive.org/web/20140209012525/http://www.gotinder.com:80/terms/,3083
+primary,Terms of Use,https://gotinder.com/terms,2014-02-01,2014-02-09T01:25:25Z,http://web.archive.org/web/20140209012525/http://www.gotinder.com:80/terms/,3083
+primary,Terms of Use,https://gotinder.com/terms,2014-03-01,2014-02-09T01:25:25Z,http://web.archive.org/web/20140209012525/http://www.gotinder.com:80/terms/,3083
+primary,Terms of Use,https://gotinder.com/terms,2014-04-01,2014-02-09T01:25:25Z,http://web.archive.org/web/20140209012525/http://www.gotinder.com:80/terms/,3083
+primary,Terms of Use,https://gotinder.com/terms,2014-05-01,2014-02-09T01:25:25Z,http://web.archive.org/web/20140209012525/http://www.gotinder.com:80/terms/,3083
+primary,Terms of Use,https://gotinder.com/terms,2014-06-01,2014-02-09T01:25:25Z,http://web.archive.org/web/20140209012525/http://www.gotinder.com:80/terms/,3083
+primary,Terms of Use,https://gotinder.com/terms,2014-07-01,2014-02-09T01:25:25Z,http://web.archive.org/web/20140209012525/http://www.gotinder.com:80/terms/,3083
+primary,Terms of Use,https://gotinder.com/terms,2014-08-01,2014-02-09T01:25:25Z,http://web.archive.org/web/20140209012525/http://www.gotinder.com:80/terms/,3083
+primary,Terms of Use,https://gotinder.com/terms,2014-09-01,2014-02-09T01:25:25Z,http://web.archive.org/web/20140209012525/http://www.gotinder.com:80/terms/,3083
+primary,Terms of Use,https://gotinder.com/terms,2014-10-01,2014-02-09T01:25:25Z,http://web.archive.org/web/20140209012525/http://www.gotinder.com:80/terms/,3083
+primary,Terms of Use,https://gotinder.com/terms,2014-11-01,2014-02-09T01:25:25Z,http://web.archive.org/web/20140209012525/http://www.gotinder.com:80/terms/,3083
+primary,Terms of Use,https://gotinder.com/terms,2014-12-01,2014-02-09T01:25:25Z,http://web.archive.org/web/20140209012525/http://www.gotinder.com:80/terms/,3083
+primary,Terms of Use,https://gotinder.com/terms,2015-01-01,2015-01-13T07:31:29Z,http://web.archive.org/web/20150113073129/http://www.gotinder.com:80/terms,0
+primary,Terms of Use,https://gotinder.com/terms,2015-02-01,2015-01-13T07:31:29Z,http://web.archive.org/web/20150113073129/http://www.gotinder.com:80/terms,0
+primary,Terms of Use,https://gotinder.com/terms,2015-03-01,2015-01-13T07:31:29Z,http://web.archive.org/web/20150113073129/http://www.gotinder.com:80/terms,0
+primary,Terms of Use,https://gotinder.com/terms,2015-04-01,2015-01-13T07:31:29Z,http://web.archive.org/web/20150113073129/http://www.gotinder.com:80/terms,0
+primary,Terms of Use,https://gotinder.com/terms,2015-05-01,2015-01-13T07:31:29Z,http://web.archive.org/web/20150113073129/http://www.gotinder.com:80/terms,0
+primary,Terms of Use,https://gotinder.com/terms,2015-06-01,2015-01-13T07:31:29Z,http://web.archive.org/web/20150113073129/http://www.gotinder.com:80/terms,0
+primary,Terms of Use,https://gotinder.com/terms,2015-07-01,2015-01-13T07:31:29Z,http://web.archive.org/web/20150113073129/http://www.gotinder.com:80/terms,0
+primary,Terms of Use,https://gotinder.com/terms,2015-08-01,2015-01-13T07:31:29Z,http://web.archive.org/web/20150113073129/http://www.gotinder.com:80/terms,0
+primary,Terms of Use,https://gotinder.com/terms,2015-09-01,2015-01-13T07:31:29Z,http://web.archive.org/web/20150113073129/http://www.gotinder.com:80/terms,0
+primary,Terms of Use,https://gotinder.com/terms,2015-10-01,2015-01-13T07:31:29Z,http://web.archive.org/web/20150113073129/http://www.gotinder.com:80/terms,0
+primary,Terms of Use,https://gotinder.com/terms,2015-11-01,2015-01-13T07:31:29Z,http://web.archive.org/web/20150113073129/http://www.gotinder.com:80/terms,0
+primary,Terms of Use,https://gotinder.com/terms,2015-12-01,2015-01-13T07:31:29Z,http://web.archive.org/web/20150113073129/http://www.gotinder.com:80/terms,0
+primary,Terms of Use,https://gotinder.com/terms,2016-01-01,2016-01-08T17:03:03Z,http://web.archive.org/web/20160108170303/http://www.gotinder.com:80/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2016-02-01,2016-01-08T17:03:03Z,http://web.archive.org/web/20160108170303/http://www.gotinder.com:80/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2016-03-01,2016-01-08T17:03:03Z,http://web.archive.org/web/20160108170303/http://www.gotinder.com:80/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2016-04-01,2016-01-08T17:03:03Z,http://web.archive.org/web/20160108170303/http://www.gotinder.com:80/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2016-05-01,2016-01-08T17:03:03Z,http://web.archive.org/web/20160108170303/http://www.gotinder.com:80/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2016-06-01,2016-01-08T17:03:03Z,http://web.archive.org/web/20160108170303/http://www.gotinder.com:80/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2016-07-01,2016-01-08T17:03:03Z,http://web.archive.org/web/20160108170303/http://www.gotinder.com:80/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2016-08-01,2016-01-08T17:03:03Z,http://web.archive.org/web/20160108170303/http://www.gotinder.com:80/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2016-09-01,2016-01-08T17:03:03Z,http://web.archive.org/web/20160108170303/http://www.gotinder.com:80/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2016-10-01,2016-01-08T17:03:03Z,http://web.archive.org/web/20160108170303/http://www.gotinder.com:80/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2016-11-01,2016-01-08T17:03:03Z,http://web.archive.org/web/20160108170303/http://www.gotinder.com:80/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2016-12-01,2016-01-08T17:03:03Z,http://web.archive.org/web/20160108170303/http://www.gotinder.com:80/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2017-01-01,2016-12-30T19:55:27Z,http://web.archive.org/web/20161230195527/https://www.gotinder.com/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2017-02-01,2016-12-30T19:55:27Z,http://web.archive.org/web/20161230195527/https://www.gotinder.com/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2017-03-01,2016-12-30T19:55:27Z,http://web.archive.org/web/20161230195527/https://www.gotinder.com/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2017-04-01,2016-12-30T19:55:27Z,http://web.archive.org/web/20161230195527/https://www.gotinder.com/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2017-05-01,2016-12-30T19:55:27Z,http://web.archive.org/web/20161230195527/https://www.gotinder.com/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2017-06-01,2016-12-30T19:55:27Z,http://web.archive.org/web/20161230195527/https://www.gotinder.com/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2017-07-01,2016-12-30T19:55:27Z,http://web.archive.org/web/20161230195527/https://www.gotinder.com/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2017-08-01,2016-12-30T19:55:27Z,http://web.archive.org/web/20161230195527/https://www.gotinder.com/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2017-09-01,2016-12-30T19:55:27Z,http://web.archive.org/web/20161230195527/https://www.gotinder.com/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2017-10-01,2016-12-30T19:55:27Z,http://web.archive.org/web/20161230195527/https://www.gotinder.com/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2017-11-01,2016-12-30T19:55:27Z,http://web.archive.org/web/20161230195527/https://www.gotinder.com/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2017-12-01,2016-12-30T19:55:27Z,http://web.archive.org/web/20161230195527/https://www.gotinder.com/terms,64
+primary,Terms of Use,https://gotinder.com/terms,2018-01-01,2017-12-31T18:14:23Z,http://web.archive.org/web/20171231181423/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2018-02-01,2017-12-31T18:14:23Z,http://web.archive.org/web/20171231181423/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2018-03-01,2017-12-31T18:14:23Z,http://web.archive.org/web/20171231181423/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2018-04-01,2017-12-31T18:14:23Z,http://web.archive.org/web/20171231181423/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2018-05-01,2017-12-31T18:14:23Z,http://web.archive.org/web/20171231181423/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2018-06-01,2017-12-31T18:14:23Z,http://web.archive.org/web/20171231181423/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2018-07-01,2017-12-31T18:14:23Z,http://web.archive.org/web/20171231181423/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2018-08-01,2017-12-31T18:14:23Z,http://web.archive.org/web/20171231181423/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2018-09-01,2017-12-31T18:14:23Z,http://web.archive.org/web/20171231181423/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2018-10-01,2017-12-31T18:14:23Z,http://web.archive.org/web/20171231181423/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2018-11-01,2017-12-31T18:14:23Z,http://web.archive.org/web/20171231181423/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2018-12-01,2017-12-31T18:14:23Z,http://web.archive.org/web/20171231181423/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2019-01-01,2018-11-06T17:50:13Z,http://web.archive.org/web/20181106175013/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2019-02-01,2018-11-06T17:50:13Z,http://web.archive.org/web/20181106175013/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2019-03-01,2018-11-06T17:50:13Z,http://web.archive.org/web/20181106175013/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2019-04-01,2018-11-06T17:50:13Z,http://web.archive.org/web/20181106175013/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2019-05-01,2018-11-06T17:50:13Z,http://web.archive.org/web/20181106175013/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2019-06-01,2018-11-06T17:50:13Z,http://web.archive.org/web/20181106175013/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2019-07-01,2018-11-06T17:50:13Z,http://web.archive.org/web/20181106175013/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2019-08-01,2018-11-06T17:50:13Z,http://web.archive.org/web/20181106175013/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2019-09-01,2018-11-06T17:50:13Z,http://web.archive.org/web/20181106175013/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2019-10-01,2018-11-06T17:50:13Z,http://web.archive.org/web/20181106175013/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2019-11-01,2018-11-06T17:50:13Z,http://web.archive.org/web/20181106175013/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2019-12-01,2018-11-06T17:50:13Z,http://web.archive.org/web/20181106175013/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2020-01-01,2019-12-07T10:42:30Z,http://web.archive.org/web/20191207104230/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2020-02-01,2019-12-07T10:42:30Z,http://web.archive.org/web/20191207104230/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2020-03-01,2019-12-07T10:42:30Z,http://web.archive.org/web/20191207104230/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2020-04-01,2019-12-07T10:42:30Z,http://web.archive.org/web/20191207104230/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2020-05-01,2019-12-07T10:42:30Z,http://web.archive.org/web/20191207104230/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2020-06-01,2019-12-07T10:42:30Z,http://web.archive.org/web/20191207104230/https://www.gotinder.com/terms,167
+primary,Terms of Use,https://gotinder.com/terms,2020-07-01,2019-12-07T10:42:30Z,http://web.archive.org/web/20191207104230/https://www.gotinder.com/terms,167
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2013-03-01,2013-04-01T00:29:32Z,http://web.archive.org/web/20130401002932/http://www.gotinder.com:80/privacy/,1054
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2013-04-01,2013-04-01T00:29:32Z,http://web.archive.org/web/20130401002932/http://www.gotinder.com:80/privacy/,1054
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2013-05-01,2013-04-01T00:29:32Z,http://web.archive.org/web/20130401002932/http://www.gotinder.com:80/privacy/,1054
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2013-06-01,2013-04-01T00:29:32Z,http://web.archive.org/web/20130401002932/http://www.gotinder.com:80/privacy/,1054
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2013-07-01,2013-04-01T00:29:32Z,http://web.archive.org/web/20130401002932/http://www.gotinder.com:80/privacy/,1054
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2013-08-01,2013-04-01T00:29:32Z,http://web.archive.org/web/20130401002932/http://www.gotinder.com:80/privacy/,1054
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2013-09-01,2013-04-01T00:29:32Z,http://web.archive.org/web/20130401002932/http://www.gotinder.com:80/privacy/,1054
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2013-10-01,2013-04-01T00:29:32Z,http://web.archive.org/web/20130401002932/http://www.gotinder.com:80/privacy/,1054
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2013-11-01,2013-04-01T00:29:32Z,http://web.archive.org/web/20130401002932/http://www.gotinder.com:80/privacy/,1054
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2013-12-01,2013-04-01T00:29:32Z,http://web.archive.org/web/20130401002932/http://www.gotinder.com:80/privacy/,1054
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2014-01-01,2014-02-15T02:45:54Z,http://web.archive.org/web/20140215024554/http://www.gotinder.com/privacy/,995
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2014-02-01,2014-02-15T02:45:54Z,http://web.archive.org/web/20140215024554/http://www.gotinder.com/privacy/,995
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2014-03-01,2014-02-15T02:45:54Z,http://web.archive.org/web/20140215024554/http://www.gotinder.com/privacy/,995
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2014-04-01,2014-02-15T02:45:54Z,http://web.archive.org/web/20140215024554/http://www.gotinder.com/privacy/,995
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2014-05-01,2014-02-15T02:45:54Z,http://web.archive.org/web/20140215024554/http://www.gotinder.com/privacy/,995
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2014-06-01,2014-02-15T02:45:54Z,http://web.archive.org/web/20140215024554/http://www.gotinder.com/privacy/,995
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2014-07-01,2014-02-15T02:45:54Z,http://web.archive.org/web/20140215024554/http://www.gotinder.com/privacy/,995
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2014-08-01,2014-02-15T02:45:54Z,http://web.archive.org/web/20140215024554/http://www.gotinder.com/privacy/,995
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2014-09-01,2014-02-15T02:45:54Z,http://web.archive.org/web/20140215024554/http://www.gotinder.com/privacy/,995
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2014-10-01,2014-02-15T02:45:54Z,http://web.archive.org/web/20140215024554/http://www.gotinder.com/privacy/,995
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2014-11-01,2014-02-15T02:45:54Z,http://web.archive.org/web/20140215024554/http://www.gotinder.com/privacy/,995
+secondary,Privacy Policy,http://www.gotinder.com/privacy,2014-12-01,2014-02-15T02:45:54Z,http://web.archive.org/web/20140215024554/http://www.gotinder.com/privacy/,995
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2017-08-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2017-09-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2017-10-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2017-11-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2017-12-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2018-01-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2018-02-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2018-03-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2018-04-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2018-05-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2018-06-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2018-07-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2018-08-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2018-09-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2018-10-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2018-11-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2018-12-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2019-01-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2019-02-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2019-03-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2019-04-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2019-05-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2019-06-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2019-07-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2019-08-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2019-09-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2019-10-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2019-11-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2019-12-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2020-01-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2020-02-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2020-03-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2020-04-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2020-05-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2020-06-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2020-07-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2020-08-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2020-09-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2020-10-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2020-11-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2020-12-01,2020-05-19T01:39:56Z,http://web.archive.org/web/20200519013956/https://policies.tinder.com/terms/intl/en,5433
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2021-01-01,2021-01-18T17:12:27Z,http://web.archive.org/web/20210118171227/https://policies.tinder.com/terms/intl/en,5516
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2021-02-01,2021-01-18T17:12:27Z,http://web.archive.org/web/20210118171227/https://policies.tinder.com/terms/intl/en,5516
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2021-03-01,2021-01-18T17:12:27Z,http://web.archive.org/web/20210118171227/https://policies.tinder.com/terms/intl/en,5516
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2021-04-01,2021-01-18T17:12:27Z,http://web.archive.org/web/20210118171227/https://policies.tinder.com/terms/intl/en,5516
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2021-05-01,2021-01-18T17:12:27Z,http://web.archive.org/web/20210118171227/https://policies.tinder.com/terms/intl/en,5516
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2021-06-01,2021-01-18T17:12:27Z,http://web.archive.org/web/20210118171227/https://policies.tinder.com/terms/intl/en,5516
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2021-07-01,2021-01-18T17:12:27Z,http://web.archive.org/web/20210118171227/https://policies.tinder.com/terms/intl/en,5516
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2021-08-01,2021-01-18T17:12:27Z,http://web.archive.org/web/20210118171227/https://policies.tinder.com/terms/intl/en,5516
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2021-09-01,2021-01-18T17:12:27Z,http://web.archive.org/web/20210118171227/https://policies.tinder.com/terms/intl/en,5516
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2021-10-01,2021-01-18T17:12:27Z,http://web.archive.org/web/20210118171227/https://policies.tinder.com/terms/intl/en,5516
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2021-11-01,2021-01-18T17:12:27Z,http://web.archive.org/web/20210118171227/https://policies.tinder.com/terms/intl/en,5516
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2021-12-01,2021-01-18T17:12:27Z,http://web.archive.org/web/20210118171227/https://policies.tinder.com/terms/intl/en,5516
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2022-01-01,2022-01-21T18:06:14Z,http://web.archive.org/web/20220121180614/https://policies.tinder.com/terms/intl/en,5793
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2022-02-01,2022-01-21T18:06:14Z,http://web.archive.org/web/20220121180614/https://policies.tinder.com/terms/intl/en,5793
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2022-03-01,2022-01-21T18:06:14Z,http://web.archive.org/web/20220121180614/https://policies.tinder.com/terms/intl/en,5793
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2022-04-01,2022-01-21T18:06:14Z,http://web.archive.org/web/20220121180614/https://policies.tinder.com/terms/intl/en,5793
+primary,Terms of Use,https://policies.tinder.com/terms/intl/en,2022-05-01,2022-01-21T18:06:14Z,http://web.archive.org/web/20220121180614/https://policies.tinder.com/terms/intl/en,5793
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2017-08-01,2017-10-04T21:14:08Z,http://web.archive.org/web/20171004211408/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2017-09-01,2017-10-04T21:14:08Z,http://web.archive.org/web/20171004211408/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2017-10-01,2017-10-04T21:14:08Z,http://web.archive.org/web/20171004211408/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2017-11-01,2017-10-04T21:14:08Z,http://web.archive.org/web/20171004211408/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2017-12-01,2017-10-04T21:14:08Z,http://web.archive.org/web/20171004211408/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2018-01-01,2017-12-22T19:38:02Z,http://web.archive.org/web/20171222193802/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2018-02-01,2017-12-22T19:38:02Z,http://web.archive.org/web/20171222193802/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2018-03-01,2017-12-22T19:38:02Z,http://web.archive.org/web/20171222193802/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2018-04-01,2017-12-22T19:38:02Z,http://web.archive.org/web/20171222193802/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2018-05-01,2017-12-22T19:38:02Z,http://web.archive.org/web/20171222193802/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2018-06-01,2017-12-22T19:38:02Z,http://web.archive.org/web/20171222193802/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2018-07-01,2017-12-22T19:38:02Z,http://web.archive.org/web/20171222193802/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2018-08-01,2017-12-22T19:38:02Z,http://web.archive.org/web/20171222193802/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2018-09-01,2017-12-22T19:38:02Z,http://web.archive.org/web/20171222193802/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2018-10-01,2017-12-22T19:38:02Z,http://web.archive.org/web/20171222193802/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2018-11-01,2017-12-22T19:38:02Z,http://web.archive.org/web/20171222193802/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2018-12-01,2017-12-22T19:38:02Z,http://web.archive.org/web/20171222193802/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2019-01-01,2019-02-03T11:28:28Z,http://web.archive.org/web/20190203112828/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2019-02-01,2019-02-03T11:28:28Z,http://web.archive.org/web/20190203112828/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2019-03-01,2019-02-03T11:28:28Z,http://web.archive.org/web/20190203112828/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2019-04-01,2019-02-03T11:28:28Z,http://web.archive.org/web/20190203112828/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2019-05-01,2019-02-03T11:28:28Z,http://web.archive.org/web/20190203112828/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2019-06-01,2019-02-03T11:28:28Z,http://web.archive.org/web/20190203112828/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2019-07-01,2019-02-03T11:28:28Z,http://web.archive.org/web/20190203112828/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2019-08-01,2019-02-03T11:28:28Z,http://web.archive.org/web/20190203112828/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2019-09-01,2019-02-03T11:28:28Z,http://web.archive.org/web/20190203112828/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2019-10-01,2019-02-03T11:28:28Z,http://web.archive.org/web/20190203112828/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2019-11-01,2019-02-03T11:28:28Z,http://web.archive.org/web/20190203112828/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2019-12-01,2019-02-03T11:28:28Z,http://web.archive.org/web/20190203112828/https://www.gotinder.com/community-guidelines,167
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2020-01-01,2020-01-01T05:13:11Z,http://web.archive.org/web/20200101051311/https://www.gotinder.com/community-guidelines,169
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2020-02-01,2020-01-01T05:13:11Z,http://web.archive.org/web/20200101051311/https://www.gotinder.com/community-guidelines,169
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2020-03-01,2020-01-01T05:13:11Z,http://web.archive.org/web/20200101051311/https://www.gotinder.com/community-guidelines,169
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2020-04-01,2020-01-01T05:13:11Z,http://web.archive.org/web/20200101051311/https://www.gotinder.com/community-guidelines,169
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2020-05-01,2020-01-01T05:13:11Z,http://web.archive.org/web/20200101051311/https://www.gotinder.com/community-guidelines,169
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2020-06-01,2020-01-01T05:13:11Z,http://web.archive.org/web/20200101051311/https://www.gotinder.com/community-guidelines,169
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2020-07-01,2020-01-01T05:13:11Z,http://web.archive.org/web/20200101051311/https://www.gotinder.com/community-guidelines,169
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2020-08-01,2020-01-01T05:13:11Z,http://web.archive.org/web/20200101051311/https://www.gotinder.com/community-guidelines,169
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2020-09-01,2020-01-01T05:13:11Z,http://web.archive.org/web/20200101051311/https://www.gotinder.com/community-guidelines,169
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2020-10-01,2020-01-01T05:13:11Z,http://web.archive.org/web/20200101051311/https://www.gotinder.com/community-guidelines,169
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2020-11-01,2020-01-01T05:13:11Z,http://web.archive.org/web/20200101051311/https://www.gotinder.com/community-guidelines,169
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2020-12-01,2020-01-01T05:13:11Z,http://web.archive.org/web/20200101051311/https://www.gotinder.com/community-guidelines,169
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2021-01-01,2021-01-19T13:39:01Z,http://web.archive.org/web/20210119133901/https://www.gotinder.com/community-guidelines,0
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2021-02-01,2021-01-19T13:39:01Z,http://web.archive.org/web/20210119133901/https://www.gotinder.com/community-guidelines,0
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2021-03-01,2021-01-19T13:39:01Z,http://web.archive.org/web/20210119133901/https://www.gotinder.com/community-guidelines,0
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2021-04-01,2021-01-19T13:39:01Z,http://web.archive.org/web/20210119133901/https://www.gotinder.com/community-guidelines,0
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2021-05-01,2021-01-19T13:39:01Z,http://web.archive.org/web/20210119133901/https://www.gotinder.com/community-guidelines,0
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2021-06-01,2021-01-19T13:39:01Z,http://web.archive.org/web/20210119133901/https://www.gotinder.com/community-guidelines,0
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2021-07-01,2021-01-19T13:39:01Z,http://web.archive.org/web/20210119133901/https://www.gotinder.com/community-guidelines,0
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2021-08-01,2021-01-19T13:39:01Z,http://web.archive.org/web/20210119133901/https://www.gotinder.com/community-guidelines,0
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2021-09-01,2021-01-19T13:39:01Z,http://web.archive.org/web/20210119133901/https://www.gotinder.com/community-guidelines,0
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2021-10-01,2021-01-19T13:39:01Z,http://web.archive.org/web/20210119133901/https://www.gotinder.com/community-guidelines,0
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2021-11-01,2021-01-19T13:39:01Z,http://web.archive.org/web/20210119133901/https://www.gotinder.com/community-guidelines,0
+secondary,Community Guidelines,https://www.gotinder.com/community-guidelines,2021-12-01,2021-01-19T13:39:01Z,http://web.archive.org/web/20210119133901/https://www.gotinder.com/community-guidelines,0
+secondary,safety,https://mtch.com/safety,2022-01-01,2022-03-01T19:37:48Z,http://web.archive.org/web/20220301193748/https://mtch.com/safety,3115
+secondary,safety,https://mtch.com/safety,2022-02-01,2022-03-01T19:37:48Z,http://web.archive.org/web/20220301193748/https://mtch.com/safety,3115
+secondary,safety,https://mtch.com/safety,2022-03-01,2022-03-01T19:37:48Z,http://web.archive.org/web/20220301193748/https://mtch.com/safety,3115
+secondary,safety,https://mtch.com/safety,2022-04-01,2022-03-01T19:37:48Z,http://web.archive.org/web/20220301193748/https://mtch.com/safety,3115
+secondary,safety,https://mtch.com/safety,2022-05-01,2022-03-01T19:37:48Z,http://web.archive.org/web/20220301193748/https://mtch.com/safety,3115
