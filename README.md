@@ -1,6 +1,6 @@
-# 360info report template
+# Platforms and power
 
-What's this report all about? What kind of charts or analysis have we done?
+Visualises the growing terms of service employed by tech platforms, as well as the declining survival rates of websites.
 
 ## Use + Remix rights
 
@@ -10,9 +10,9 @@ These charts, as well as the analyses that underpin them, are available under a 
 
 <!-- Do any of the data sources fall under a different licence? If so, describe the licence and which parts of the data fall under it here! if most of it does, change the above and replace LICENCE.md too -->
 
-Data in these charts comes from:
+Data in these charts comes from :
 
-* Data sources here (with links!)
+* [The Wayback Machine](https://archive.org/web), which has archived the terms of service of several major tech platforms over time.
 
 **Please attribute 360info and the data sources when you use and remix these visualisations.**
 
@@ -31,11 +31,11 @@ You'll need to:
 Now, render the `.qmd` files to the `/docs` directory with:
 
 ```sh
-quarto render --output-dir docs *.qmd
+quarto render *.qmd
 ```
 
 ## Help
 
 <!-- replace `report-template` with the name of this repo in the link below  -->
 
-If you find any problems with our analysis or charts, please feel free to [create an issue](https://github.com/360-info/report-template/issues/new)!
+If you find any problems with our analysis or charts, please feel free to [create an issue](https://github.com/360-info/report-platforms-power/issues/new)!
