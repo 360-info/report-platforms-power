@@ -663,7 +663,8 @@ spotify_words_patched %>%
           sep = "<br>"),
         caption = "**CHART:** James Goldie, 360info")
   } %>%
-  save_360plot(here("out", "wordcounts-spotify.png"), shape = "sdtv-landscape")
+  save_360plot(here("out", "wordcounts-spotify.png"), shape = "sdtv-landscape") %>%
+  save_360plot(here("out", "wordcounts-spotify.svg"), shape = "sdtv-landscape")
 ```
 
 ## Twitter
